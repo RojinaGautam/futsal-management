@@ -13,6 +13,7 @@
   <link href="{{ asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">  
   <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Add CSRF token here -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
 </head>
 
@@ -300,8 +301,14 @@
       <script src="{{ asset('backend/js/ruang-admin.min.js') }}"></script>
       <script src="{{ asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
       <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Use CDN for jQuery -->
-      
+
+      <link rel="stylesheet" href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.css') }}">
+      <link rel="stylesheet" href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
+      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
+      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script>
+      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     </body>
+
     
     </html>

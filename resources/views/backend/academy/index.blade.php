@@ -101,7 +101,7 @@
         $('#academyDataTable').DataTable({
             ajax: {
                 url: '{{ route("academy.data") }}', // Adjust the route as necessary
-                dataSrc: ''
+                dataSrc: '',
             },
             columns: [
                 { data: 'student_name' },
