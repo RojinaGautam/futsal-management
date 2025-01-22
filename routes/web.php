@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AcademyController;
 
 // Route for the home page
 Route::get('/', function () {
@@ -26,3 +27,9 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
+Route::get('/parking',function(){ return view('backend.parking'); });
+
+Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
+Route::post('/academy/store', [AcademyController::class, 'store'])->name('academy.store');
+Route::get('/academy/data', [AcademyController::class, 'getAcademyData'])->name('academy.data');
