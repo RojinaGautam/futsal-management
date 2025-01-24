@@ -25,7 +25,7 @@
         <div class="sidebar-brand-icon">
           <img src="img/logo/logo2.png">
         </div>
-        <div class="sidebar-brand-text mx-3">RuangAdmin</div>
+        <div class="sidebar-brand-text mx-3">RaveFutsal</div>
       </a>
       <hr class="sidebar-divider my-0">
       <li class="nav-item active">
@@ -36,16 +36,22 @@
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="/admin">
+        <a class="nav-link" href="/bookings">
           <i class="fas fa-fw fa-book"></i>
           <span>Bookings</span></a>
       </li>
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="/admin">
+        <a class="nav-link" href="/parking">
           <i class="fas fa-fw fa-parking"></i>
           <span>Parking</span></a>
+      </li>
+      <hr class="sidebar-divider">
+      <li class="nav-item">
+        <a class="nav-link" href="/academy">
+          <i class="fas fa-fw fa-parking"></i>
+          <span>Academy</span></a>
       </li>
       <hr class="sidebar-divider">
     </ul>

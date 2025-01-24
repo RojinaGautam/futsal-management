@@ -34,4 +34,36 @@ class AcademyController extends Controller
     {
         return Academy::all(); // You can customize this to return paginated data or specific fields
     }
+
+    public function show($id)
+    {
+        $academyMember = Academy::findOrFail($id);
+        return response()->json($academyMember);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'student_name' => 'string|max:255',
+            'monthly_price' => 'numeric',
+            'age' => 'integer',
+            'phone_no' => 'string|max:15',
+            'email' => 'email',
+            'total_due_left' => 'numeric',
+            'joined_date' => 'date',
+        ]);
+
+        $academyMember = Academy::findOrFail($id);
+        $academyMember->update($request->all());
+
+        return response()->json(['success' => 'Academy member updated successfully.']);
+    }
+
+    public function destroy($id)
+    {
+        $academyMember = Academy::findOrFail($id);
+        $academyMember->delete();
+
+        return response()->json(['success' => 'Academy member deleted successfully.']);
+    }
 }

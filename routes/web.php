@@ -28,8 +28,17 @@ Route::post('/logout', function () {
     return redirect('/');
 })->name('logout');
 
-Route::get('/parking',function(){ return view('backend.parking'); });
+// Academy routes protected by auth middleware
+Route::middleware('auth')->group(function () {
+    Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
+    Route::post('/academy/store', [AcademyController::class, 'store'])->name('academy.store');
+    Route::get('/academy/data', [AcademyController::class, 'getAcademyData'])->name('academy.data');
+    Route::get('/academy/{id}', [AcademyController::class, 'show']);
+    Route::put('/academy/{id}', [AcademyController::class, 'update']);
+    Route::delete('/academy/{id}', [AcademyController::class, 'destroy']);
+});
 
-Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
-Route::post('/academy/store', [AcademyController::class, 'store'])->name('academy.store');
-Route::get('/academy/data', [AcademyController::class, 'getAcademyData'])->name('academy.data');
+// Route for parking
+Route::get('/parking', function () {
+    return view('backend.parking');
+});
