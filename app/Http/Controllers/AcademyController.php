@@ -32,8 +32,10 @@ class AcademyController extends Controller
 
     public function getAcademyData()
     {
-        return Academy::all(); // You can customize this to return paginated data or specific fields
+        $data = Academy::all(); // Fetch all data from the Academy table
+        return response()->json($data); // Return the data as JSON
     }
+    
 
     public function show($id)
     {
