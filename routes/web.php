@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AcademyController;
+use App\Http\Controllers\AttendanceController;
 
 // Route for the home page
 Route::get('/', function () {
@@ -42,3 +43,6 @@ Route::middleware('auth')->group(function () {
 Route::get('/parking', function () {
     return view('backend.parking');
 });
+
+Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');

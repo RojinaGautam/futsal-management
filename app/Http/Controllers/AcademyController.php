@@ -23,9 +23,19 @@ class AcademyController extends Controller
             'email' => 'required|email|unique:academy',
             'total_due_left' => 'required|numeric',
             'joined_date' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
 
-        Academy::create($request->all());
+        $data = $request->all();
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $data['image'] = $imageName; // Save the image name in the database
+        }
+
+        Academy::create($data);
 
         return response()->json(['success' => 'Academy member added successfully.']);
     }

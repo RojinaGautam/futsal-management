@@ -19,5 +19,12 @@ class Academy extends Model
         'email',
         'total_due_left',
         'joined_date',
+        'is_scholar', 
+        'is_regular', 
     ];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'academy_member_id');
+    }
 }

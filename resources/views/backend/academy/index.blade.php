@@ -47,8 +47,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Details will be populated here -->
-                    <div id="memberDetails"></div>
+                    <div id="memberDetails">
+                        <img id="memberImage" src="" alt="Member Image" class="img-fluid mb-3" style="display: none;">
+                        <p><strong>Name:</strong> <span id="memberName"></span></p>
+                        <p><strong>Monthly Price:</strong> <span id="memberMonthlyPrice"></span></p>
+                        <p><strong>Age:</strong> <span id="memberAge"></span></p>
+                        <p><strong>Phone No:</strong> <span id="memberPhoneNo"></span></p>
+                        <p><strong>Email:</strong> <span id="memberEmail"></span></p>
+                        <p><strong>Total Due Left:</strong> <span id="memberTotalDueLeft"></span></p>
+                        <p><strong>Joined Date:</strong> <span id="memberJoinedDate"></span></p>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -94,7 +102,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="addAcademyForm">
+                <form id="addAcademyForm" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="student_name">Student Name</label>
@@ -144,7 +152,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="editAcademyForm">
+                <form id="editAcademyForm" enctype="multipart/form-data">
                     <div class="modal-body">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="form-group">
@@ -185,6 +193,7 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -225,17 +234,36 @@
         </div>
     </div>
 
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
     $(document).ready(function() {
-        // Set up CSRF token for AJAX requests
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
         // Initialize DataTable
         var table = $('#academyDataTable').DataTable({
             ajax: {
@@ -244,6 +272,7 @@
             },
             columns: [
                 { data: 'id' },
+
                 { data: 'student_name' },
                 { data: 'total_due_left' },
                 {
@@ -275,15 +304,21 @@
                 url: '/academy/' + id,
                 success: function(response) {
                     // Populate the modal with member details
-                    $('#memberDetails').html(`
-                        <p><strong>Name:</strong> ${response.student_name}</p>
-                        <p><strong>Monthly Price:</strong> ${response.monthly_price}</p>
-                        <p><strong>Age:</strong> ${response.age}</p>
-                        <p><strong>Phone No:</strong> ${response.phone_no}</p>
-                        <p><strong>Email:</strong> ${response.email}</p>
-                        <p><strong>Total Due Left:</strong> ${response.total_due_left}</p>
-                        <p><strong>Joined Date:</strong> ${response.joined_date}</p>
-                    `);
+                    $('#memberName').text(response.student_name);
+                    $('#memberMonthlyPrice').text(response.monthly_price);
+                    $('#memberAge').text(response.age);
+                    $('#memberPhoneNo').text(response.phone_no);
+                    $('#memberEmail').text(response.email);
+                    $('#memberTotalDueLeft').text(response.total_due_left);
+                    $('#memberJoinedDate').text(response.joined_date);
+
+                    // Show the image if it exists
+                    if (response.image) {
+                        $('#memberImage').attr('src', '/images/' + response.image).show(); // Set the image source and show it
+                    } else {
+                        $('#memberImage').hide(); // Hide the image if it doesn't exist
+                    }
+
                     $('#viewDetailsModal').modal('show'); // Show the modal
                 }
             });
@@ -302,27 +337,36 @@
         $('#paymentForm').on('submit', function(e) {
             e.preventDefault();
             var id = $(this).data('id');
-            var paymentAmount = $('#payment_amount').val();
+            var paymentAmount = parseFloat($('#payment_amount').val());
             var totalDueLeft = parseFloat($('#paymentMemberDetails strong').text());
 
-            // Update the total due left
-            var newTotalDueLeft = totalDueLeft - parseFloat(paymentAmount);
+            // Check if payment amount exceeds total due left
+            if (paymentAmount > totalDueLeft) {
+                $('#errorMessage').text('Payment amount cannot exceed the total due left of ' + totalDueLeft);
+                $('#errorModal').modal('show'); // Show the error modal
+                return; // Stop the submission
+            }
 
-            // Make an AJAX call to update the database (you need to implement this in your controller)
+            // Update the total due left
+            var newTotalDueLeft = totalDueLeft - paymentAmount;
+
+            // Make an AJAX call to update the database
             $.ajax({
                 type: 'PUT',
                 url: '/academy/' + id,
                 data: {
                     total_due_left: newTotalDueLeft,
-                    _token: '{{ csrf_token() }}' // Include CSRF token
+                    _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
                 },
                 success: function(response) {
                     $('#paymentModal').modal('hide');
                     table.ajax.reload(); // Reload the DataTable
-                    alert('Payment successful! New Total Due Left: ' + newTotalDueLeft);
+                    $('#successMessage').text('Payment successful! New Total Due Left: ' + newTotalDueLeft);
+                    $('#successModal').modal('show'); // Show the success modal
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
+                    $('#errorMessage').text('Error: ' + xhr.responseJSON.message);
+                    $('#errorModal').modal('show'); // Show the error modal
                 }
             });
         });
@@ -330,15 +374,18 @@
         // Handle add form submission
         $('#addAcademyForm').on('submit', function(e) {
             e.preventDefault();
+            var formData = new FormData(this); // Create FormData object
             $.ajax({
                 type: 'POST',
                 url: '{{ route("academy.store") }}',
-                data: $(this).serialize(),
+                data: formData,
+                processData: false, // Important for file uploads
+                contentType: false, // Important for file uploads
                 success: function(response) {
                     $('#addAcademyModal').modal('hide');
                     table.ajax.reload();
                     $('#successMessage').text(response.success);
-                    $('#successModal').modal('show');
+                    $('#successModal').modal('show'); // Show the success modal
                 },
                 error: function(xhr) {
                     alert('Error: ' + xhr.responseJSON.message);
@@ -370,15 +417,18 @@
         $('#editAcademyForm').on('submit', function(e) {
             e.preventDefault();
             var id = $('#edit_id').val();
+            var formData = new FormData(this); // Create FormData object
             $.ajax({
                 type: 'PUT',
                 url: '/academy/' + id,
-                data: $(this).serialize(),
+                data: formData,
+                processData: false, // Important for file uploads
+                contentType: false, // Important for file uploads
                 success: function(response) {
                     $('#editAcademyModal').modal('hide');
                     table.ajax.reload();
                     $('#successMessage').text(response.success);
-                    $('#successModal').modal('show');
+                    $('#successModal').modal('show'); // Show the success modal
                 },
                 error: function(xhr) {
                     alert('Error: ' + xhr.responseJSON.message);
@@ -389,11 +439,11 @@
         // Handle delete icon click
         $('#academyDataTable').on('click', '.delete-btn', function() {
             var id = $(this).data('id');
-            $('#confirmDeleteBtn').data('id', id); // Store the ID in the confirm button
-            $('#deleteConfirmationModal').modal('show'); // Show the confirmation modal
+            $('#confirmDeleteBtn').data('id', id); // Store the ID in the delete button
+            $('#deleteConfirmationModal').modal('show'); // Show the delete confirmation modal
         });
 
-        // Handle confirm delete button click
+        // Handle delete confirmation
         $('#confirmDeleteBtn').on('click', function() {
             var id = $(this).data('id');
             $.ajax({
@@ -403,7 +453,51 @@
                     $('#deleteConfirmationModal').modal('hide');
                     table.ajax.reload();
                     $('#successMessage').text(response.success);
-                    $('#successModal').modal('show');
+                    $('#successModal').modal('show'); // Show the success modal
+                },
+                error: function(xhr) {
+                    alert('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+
+        $('#selectAll').on('change', function() {
+            var isChecked = $(this).is(':checked');
+            $('input[type="checkbox"]').prop('checked', isChecked);
+        });
+
+        $('#attendanceForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serializeArray(); // Use serializeArray to get an array of form data
+            var attendanceData = {};
+
+            // Build the attendance data object
+            formData.forEach(function(item) {
+                if (item.name.startsWith('attendance')) {
+                    attendanceData[item.name.split('[')[1].split(']')[0]] = item.value; // Extract the member ID
+                }
+            });
+
+            // Check if attendance data is empty
+            if (Object.keys(attendanceData).length === 0) {
+                alert('Please select at least one member to mark attendance.');
+                return; // Stop the submission
+            }
+
+            // Add the attendance date to the data
+            attendanceData.attendance_date = $('#attendance_date').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ route("attendance.store") }}',
+                data: {
+                    attendance: attendanceData,
+                    attendance_date: $('#attendance_date').val(),
+                    _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+                },
+                success: function(response) {
+                    alert(response.success);
+                    location.reload(); // Reload the page to see updated attendance
                 },
                 error: function(xhr) {
                     alert('Error: ' + xhr.responseJSON.message);
