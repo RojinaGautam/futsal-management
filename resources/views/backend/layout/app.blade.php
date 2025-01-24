@@ -8,13 +8,20 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <link href="{{ asset('img/logo/logo.png') }}" rel="icon">
-  <title>RuangAdmin - Dashboard</title>
+  <title>RAVE - Dashboard</title>
   <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
   <link href="{{ asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">  
   <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Add CSRF token here -->
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.css') }}">
+  <link rel="stylesheet" href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
+  <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<!-- 
+      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
+      
+      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script> -->
 </head>
 
 <body id="page-top">
@@ -23,9 +30,9 @@
     <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
         <div class="sidebar-brand-icon">
-          <img src="img/logo/logo2.png">
+          <!-- <img src="img/logo/logo2.png"> -->
         </div>
-        <div class="sidebar-brand-text mx-3">RaveFutsal</div>
+        <div class="sidebar-brand-text mx-3">Rave Futsal</div>
       </a>
       <hr class="sidebar-divider my-0">
       <li class="nav-item active">
@@ -308,12 +315,8 @@
       <script src="{{ asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
       <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
 
-      <link rel="stylesheet" href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.css') }}">
-      <link rel="stylesheet" href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
-      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
-      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script>
-      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+     
+      
     </body>
 
     
