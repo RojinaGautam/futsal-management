@@ -18,6 +18,7 @@ class Attendance extends Model
 
     public function academyMember()
     {
-        return $this->belongsTo(Academy::class);
+        return $this->belongsTo(Academy::class, 'academy_member_id');
     }
+
 }
