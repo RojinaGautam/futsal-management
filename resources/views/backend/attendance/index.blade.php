@@ -18,7 +18,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th><input type="checkbox" id="selectAll"></th>
-                                <th>ID</th>
+                                <th>UN-ID</th>
                                 <th>Name</th>
                                 
                             </tr>
@@ -42,11 +42,26 @@
 
 <script>
     $(document).ready(function() {
-        // Select/Deselect all checkboxes
-        $('#selectAll').on('change', function() {
-            var isChecked = $(this).is(':checked');
-            $('.attendance-checkbox').prop('checked', isChecked);
-        });
+    // Select/Deselect all checkboxes
+    $('#selectAll').on('change', function() {
+        var isChecked = $(this).is(':checked');
+        $('.attendance-checkbox').prop('checked', isChecked);
+        logCheckedCheckboxes(); // Log checked checkboxes
     });
+
+    // Log checked checkboxes when individual checkboxes are changed
+    $('.attendance-checkbox').on('change', function() {
+        logCheckedCheckboxes(); // Log checked checkboxes
+    });
+
+    // Function to log checked checkboxes
+    function logCheckedCheckboxes() {
+        var checkedBoxes = [];
+        $('.attendance-checkbox:checked').each(function() {
+            checkedBoxes.push($(this).closest('tr').find('td:nth-child(2)').text()); // Get the ID from the second column
+        });
+        console.log('Checked IDs:', checkedBoxes);
+    }
+});
 </script>
 @endsection

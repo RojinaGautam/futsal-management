@@ -35,9 +35,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
     Route::post('/academy/store', [AcademyController::class, 'store'])->name('academy.store');
     Route::get('/academy/data', [AcademyController::class, 'getAcademyData'])->name('academy.data');
-    Route::get('/academy/{id}', [AcademyController::class, 'show']);
-    Route::put('/academy/{id}', [AcademyController::class, 'update']);
+    Route::get('/academy/{id}', [AcademyController::class, 'show'])->name('academy.show');
+    Route::patch('/academy/update/{id}', [AcademyController::class, 'update'])->name('academy.update');
     Route::delete('/academy/{id}', [AcademyController::class, 'destroy']);
+    Route::put('/academy/{id}/payment', [AcademyController::class, 'updatePayment'])->name('academy.updatePayment');
 });
 
 // Route for parking

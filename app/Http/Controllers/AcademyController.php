@@ -23,50 +23,67 @@ class AcademyController extends Controller
             'email' => 'required|email|unique:academy',
             'total_due_left' => 'required|numeric',
             'joined_date' => 'required|date',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
 
-        $data = $request->all();
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
-            $data['image'] = $imageName; // Save the image name in the database
-        }
-
-        Academy::create($data);
+        Academy::create($request->all());
 
         return response()->json(['success' => 'Academy member added successfully.']);
     }
 
     public function getAcademyData()
     {
-        $data = Academy::all(); // Fetch all data from the Academy table
-        return response()->json($data); // Return the data as JSON
+        return Academy::all(); // You can customize this to return paginated data or specific fields
     }
-    
 
     public function show($id)
     {
         $academyMember = Academy::findOrFail($id);
-        return response()->json($academyMember);
+
+        // Decode the payment history JSON to an array
+        $paymentHistory = json_decode($academyMember->payment_history, true);
+
+        return response()->json([
+            'id' => $academyMember->id,
+            'student_name' => $academyMember->student_name,
+            'monthly_price' => $academyMember->monthly_price,
+            'age' => $academyMember->age,
+            'phone_no' => $academyMember->phone_no,
+            'email' => $academyMember->email,
+            'total_due_left' => $academyMember->total_due_left,
+            'joined_date' => $academyMember->joined_date,
+            'payment_history' => $paymentHistory, // Include payment history
+        ]);
     }
 
     public function update(Request $request, $id)
     {
+        // Validate the incoming request
         $request->validate([
-            'student_name' => 'string|max:255',
-            'monthly_price' => 'numeric',
-            'age' => 'integer',
-            'phone_no' => 'string|max:15',
-            'email' => 'email',
-            'total_due_left' => 'numeric',
-            'joined_date' => 'date',
+            'edit_student_name' => 'required|string|max:255',
+            'edit_monthly_price' => 'required|numeric',
+            'edit_age' => 'required|integer',
+            'edit_phone_no' => 'required|string|max:15',
+            'edit_email' => 'required|email',
+            'edit_total_due_left' => 'required|numeric',
+            'edit_joined_date' => 'required|date',
         ]);
 
+        // Find the academy member by ID
         $academyMember = Academy::findOrFail($id);
-        $academyMember->update($request->all());
+
+        // Update the member with the validated data
+        $academyMember->fill($request->only([
+            'edit_student_name',
+            'edit_monthly_price',
+            'edit_age',
+            'edit_phone_no',
+            'edit_email',
+            'edit_total_due_left',
+            'edit_joined_date',
+        ]));
+
+        // Save the changes
+        $academyMember->save();
 
         return response()->json(['success' => 'Academy member updated successfully.']);
     }
@@ -77,5 +94,40 @@ class AcademyController extends Controller
         $academyMember->delete();
 
         return response()->json(['success' => 'Academy member deleted successfully.']);
+    }
+
+    public function updatePayment(Request $request, $id)
+    {
+        $academy = Academy::findOrFail($id);
+
+        // Validate the request
+        $request->validate([
+            'payment_amount' => 'required|numeric',
+            'payment_date' => 'required|date',
+        ]);
+
+        // Calculate the new total due left
+        $newTotalDueLeft = $academy->total_due_left - $request->payment_amount;
+
+        // Ensure the new total due left is not negative
+        if ($newTotalDueLeft < 0) {
+            return response()->json(['error' => 'Payment amount exceeds total due left.'], 400);
+        }
+
+        // Update the total due left
+        $academy->total_due_left = $newTotalDueLeft;
+
+        // Add payment history
+        $paymentHistory = $academy->payment_history ? json_decode($academy->payment_history, true) : [];
+        $paymentHistory[] = [
+            'amount' => $request->payment_amount,
+            'date' => $request->payment_date,
+        ];
+        $academy->payment_history = json_encode($paymentHistory);
+
+        // Save the changes
+        $academy->save();
+
+        return response()->json(['success' => 'Payment updated successfully!']);
     }
 }

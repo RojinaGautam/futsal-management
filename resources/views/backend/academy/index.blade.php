@@ -195,43 +195,43 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
-                                    <input type="text" class="form-control" id="edit_student_name" name="student_name" placeholder="Enter full name" required>
+                                    <input type="text" class="form-control" id="edit_student_name" name="edit_student_name" placeholder="Enter full name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
-                                    <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" placeholder="Enter monthly price" required>
+                                    <input type="number" class="form-control" id="edit_monthly_price" name="edit_monthly_price" placeholder="Enter monthly price" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_age" class="font-weight-bold">Age</label>
-                                    <input type="number" class="form-control" id="edit_age" name="age" placeholder="Enter age" required>
+                                    <input type="number" class="form-control" id="edit_age" name="edit_age" placeholder="Enter age" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_phone_no" class="font-weight-bold">Phone No</label>
-                                    <input type="text" class="form-control" id="edit_phone_no" name="phone_no" placeholder="Enter phone number" required>
+                                    <input type="text" class="form-control" id="edit_phone_no" name="edit_phone_no" placeholder="Enter phone number" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_email" class="font-weight-bold">Email</label>
-                                    <input type="email" class="form-control" id="edit_email" name="email" placeholder="Enter email address" required>
+                                    <input type="email" class="form-control" id="edit_email" name="edit_email" placeholder="Enter email address" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="edit_total_due_left" name="total_due_left" placeholder="Enter total due left" required>
+                                    <input type="number" class="form-control" id="edit_total_due_left" name="edit_total_due_left" placeholder="Enter total due left" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
-                                    <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
+                                    <input type="date" class="form-control" id="edit_joined_date" name="edit_joined_date" required>
                                 </div>
                             </div>
                         </div>
@@ -384,6 +384,12 @@
                             <p><strong>Email:</strong> ${response.email}</p>
                             <p><strong>Total Due Left:</strong> ${response.total_due_left}</p>
                             <p><strong>Joined Date:</strong> ${response.joined_date}</p>
+                            <p><strong>Payment History:</strong></p>
+                            <ul>
+                                ${response.payment_history && response.payment_history.length > 0 
+                                    ? response.payment_history.map(payment => `<li>Amount: ${payment.amount}, Date: ${payment.date}</li>`).join('') 
+                                    : '<li>No payment history available.</li>'}
+                            </ul>
                         `);
                     } else {
                         $('#memberDetails').html('<p class="text-danger">Unable to fetch member details.</p>');
@@ -410,37 +416,35 @@
         // Handle payment form submission
         $('#paymentForm').on('submit', function(e) {
             e.preventDefault();
-            var id = $(this).data('id');
+            var id = $(this).data('id'); // Ensure you set this data attribute on the payment modal
             var paymentAmount = parseFloat($('#payment_amount').val());
-            var totalDueLeft = parseFloat($('#paymentMemberDetails strong').text());
+            var paymentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-            // Check if payment amount exceeds total due left
-            if (paymentAmount > totalDueLeft) {
-                $('#errorMessage').text('Payment amount cannot exceed the total due left of ' + totalDueLeft);
-                $('#errorModal').modal('show'); // Show the error modal
-                return; // Stop the submission
+            // Validate payment amount
+            if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                toastr.error('Payment amount must be a positive number.'); // Use Toastr for error
+                return;
             }
 
-            // Update the total due left
-            var newTotalDueLeft = totalDueLeft - paymentAmount;
-
-            // Make an AJAX call to update the database
+            // Make an AJAX call to update the payment
             $.ajax({
                 type: 'PUT',
-                url: '/academy/' + id,
+                url: '/academy/' + id + '/payment', // Update the URL to point to the new method
                 data: {
-                    total_due_left: newTotalDueLeft,
+                    payment_amount: paymentAmount,
+                    payment_date: paymentDate,
                     _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
                 },
                 success: function(response) {
                     $('#paymentModal').modal('hide');
                     table.ajax.reload(); // Reload the DataTable
-                    $('#successMessage').text('Payment successful! New Total Due Left: ' + newTotalDueLeft);
-                    $('#successModal').modal('show'); // Show the success modal
+                    
+                    // Show success message with Toastr
+                    toastr.success('Payment successful! New Total Due Left: ' + response.new_total_due_left);
                 },
                 error: function(xhr) {
-                    $('#errorMessage').text('Error: ' + xhr.responseJSON.message);
-                    $('#errorModal').modal('show'); // Show the error modal
+                    // Show error message with Toastr
+                    toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
         });
@@ -467,13 +471,16 @@
             });
         });
 
-        // Handle edit icon click
+        // Handle edit button click to populate the form
         $('#academyDataTable').on('click', '.edit-btn', function() {
             var id = $(this).data('id');
+
+            // Fetch the current data for the selected academy member
             $.ajax({
                 type: 'GET',
                 url: '/academy/' + id,
                 success: function(response) {
+                    // Populate the form fields with the current data
                     $('#edit_id').val(response.id);
                     $('#edit_student_name').val(response.student_name);
                     $('#edit_monthly_price').val(response.monthly_price);
@@ -482,33 +489,52 @@
                     $('#edit_email').val(response.email);
                     $('#edit_total_due_left').val(response.total_due_left);
                     $('#edit_joined_date').val(response.joined_date);
-                    $('#editAcademyModal').modal('show'); // Show the edit modal
+                },
+                error: function() {
+                    toastr.error('Error fetching member details.'); // Use Toastr for error message
                 }
             });
+
+            // Show the modal
+            $('#editAcademyModal').modal('show');
         });
 
         // Handle edit form submission
         $('#editAcademyForm').on('submit', function(e) {
-            e.preventDefault();
-            var id = $('#edit_id').val();
+            e.preventDefault(); // Prevent the default form submission
+
+            var id = $('#edit_id').val(); // Get the ID of the member being edited
             var formData = new FormData(this); // Create FormData object
+
+            // Log the form data to the console for debugging
+            for (var pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]); // Log each field and its value
+            }
+
             $.ajax({
-                type: 'PUT',
-                url: '/academy/' + id,
+                type: 'PATCH', // Use PUT for updating
+                url: '/academy/update/' + id, // URL for the update request
                 data: formData,
-                processData: false, // Important for file uploads
-                contentType: false, // Important for file uploads
+                processData: false, // Important for FormData
+                contentType: false, // Important for FormData
                 success: function(response) {
-                    $('#editAcademyModal').modal('hide');
-                    table.ajax.reload();
-                    $('#successMessage').text(response.success);
-                    $('#successModal').modal('show'); // Show the success modal
+                    $('#editAcademyModal').modal('hide'); // Hide the modal
+                    table.ajax.reload(); // Reload the DataTable to reflect changes
+                    toastr.success(response.success); // Show success message
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
+                    // Display the validation errors (if any)
+                    var errors = xhr.responseJSON.errors;
+                    var errorMessage = '';
+                    for (var field in errors) {
+                        errorMessage += errors[field].join('<br>') + '<br>'; // Join multiple errors for the same field
+                    }
+                    toastr.error('Error: <br>' + errorMessage); // Show error message
                 }
             });
-        });
+        });  
+
+
 
         // Handle delete icon click
         $('#academyDataTable').on('click', '.delete-btn', function() {

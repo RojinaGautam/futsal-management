@@ -21,10 +21,22 @@ class Academy extends Model
         'joined_date',
         'is_scholar', 
         'is_regular', 
+        'payment_history',
     ];
 
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'academy_member_id');
+    }
+
+    public function addPaymentHistory($amount, $date)
+    {
+        $paymentHistory = $this->payment_history ? json_decode($this->payment_history, true) : [];
+        $paymentHistory[] = [
+            'amount' => $amount,
+            'date' => $date,
+        ];
+        $this->payment_history = json_encode($paymentHistory);
+        $this->save();
     }
 }

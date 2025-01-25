@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
   <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 <!-- 
       <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
       
@@ -287,18 +288,11 @@
             <div class="container my-auto">
               <div class="copyright text-center my-auto">
                 <span>copyright &copy; <script> document.write(new Date().getFullYear()); </script> - developed by
-                  <b><a href="https://indrijunanda.gitlab.io/" target="_blank">indrijunanda</a></b>
+                  <b><a href="https://dstudiosnepal.com/" target="_blank">dstudiosnepal</a></b>
                 </span>
               </div>
             </div>
     
-            <div class="container my-auto py-2">
-              <div class="copyright text-center my-auto">
-                <span>copyright &copy; <script> document.write(new Date().getFullYear()); </script> - distributed by
-                  <b><a href="https://themewagon.com/" target="_blank">themewagon</a></b>
-                </span>
-              </div>
-            </div>
           </footer>
           <!-- Footer -->
         </div>
@@ -314,9 +308,27 @@
       <script src="{{ asset('backend/js/ruang-admin.min.js') }}"></script>
       <script src="{{ asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
       <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
-
-     
-      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+      <script>
+        // Optional: Set default options for Toastr
+        toastr.options = {
+          "closeButton": true,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": true,
+          "positionClass": "toast-top-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000", // How long the toast will display without user interaction
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn", // Fade in
+          "hideMethod": "fadeOut" // Fade out
+        };
+      </script>
     </body>
 
     
