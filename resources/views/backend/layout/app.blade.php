@@ -23,6 +23,12 @@
       <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
       
       <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script> -->
+      <!-- Toastr CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+  <!-- Toastr JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 </head>
 
 <body id="page-top">

@@ -23,7 +23,7 @@
                     </button>
                 </div>
                 <div class="table-responsive p-3">
-                    <table class="table align-items-center table-flush table-hover" id="academyDataTable">
+                    <table class="table align-items-center table-flush table-hover" id="academyDataTable" style="width: 100%;">
                         <thead class="thead-light">
                             <tr>
                                 <th>UN-ID</th>
@@ -466,7 +466,7 @@
                     $('#successModal').modal('show'); // Show the success modal
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
+                    toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
         });
@@ -523,13 +523,7 @@
                     toastr.success(response.success); // Show success message
                 },
                 error: function(xhr) {
-                    // Display the validation errors (if any)
-                    var errors = xhr.responseJSON.errors;
-                    var errorMessage = '';
-                    for (var field in errors) {
-                        errorMessage += errors[field].join('<br>') + '<br>'; // Join multiple errors for the same field
-                    }
-                    toastr.error('Error: <br>' + errorMessage); // Show error message
+                    toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
         });  
@@ -552,11 +546,10 @@
                 success: function(response) {
                     $('#deleteConfirmationModal').modal('hide');
                     table.ajax.reload();
-                    $('#successMessage').text(response.success);
-                    $('#successModal').modal('show'); // Show the success modal
+                    toastr.success(response.success);
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
+                    toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
         });
@@ -580,7 +573,7 @@
 
             // Check if attendance data is empty
             if (Object.keys(attendanceData).length === 0) {
-                alert('Please select at least one member to mark attendance.');
+                toastr.error('Please select at least one member to mark attendance.');
                 return; // Stop the submission
             }
 
@@ -596,11 +589,11 @@
                     _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
                 },
                 success: function(response) {
-                    alert(response.success);
+                    toastr.success(response.success);
                     location.reload(); // Reload the page to see updated attendance
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
+                    toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
         });
