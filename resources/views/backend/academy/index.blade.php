@@ -559,44 +559,7 @@
             $('input[type="checkbox"]').prop('checked', isChecked);
         });
 
-        $('#attendanceForm').on('submit', function(e) {
-            e.preventDefault();
-            var formData = $(this).serializeArray(); // Use serializeArray to get an array of form data
-            var attendanceData = {};
-
-            // Build the attendance data object
-            formData.forEach(function(item) {
-                if (item.name.startsWith('attendance')) {
-                    attendanceData[item.name.split('[')[1].split(']')[0]] = item.value; // Extract the member ID
-                }
-            });
-
-            // Check if attendance data is empty
-            if (Object.keys(attendanceData).length === 0) {
-                toastr.error('Please select at least one member to mark attendance.');
-                return; // Stop the submission
-            }
-
-            // Add the attendance date to the data
-            attendanceData.attendance_date = $('#attendance_date').val();
-
-            $.ajax({
-                type: 'POST',
-                url: '{{ route("attendance.store") }}',
-                data: {
-                    attendance: attendanceData,
-                    attendance_date: $('#attendance_date').val(),
-                    _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
-                },
-                success: function(response) {
-                    toastr.success(response.success);
-                    location.reload(); // Reload the page to see updated attendance
-                },
-                error: function(xhr) {
-                    toastr.error('Error: ' + xhr.responseJSON.message);
-                }
-            });
-        });
+        
     });
 </script>
 @endsection

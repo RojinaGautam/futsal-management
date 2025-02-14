@@ -48,6 +48,6 @@ Route::get('/parking', function () {
 
 Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
 Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])->name('attendance.fetch');
+Route::post('/attendance/submit', [AttendanceController::class, 'submitAttendance'])->name('attendance.store');
 Route::post('/attendance/submit', [AttendanceController::class, 'submitAttendance'])->name('attendance.submit');
-
 Route::get('/attendance/data', [AttendanceController::class, 'getAttendanceData'])->name('attendance.data');
