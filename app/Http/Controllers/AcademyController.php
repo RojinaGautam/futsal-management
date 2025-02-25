@@ -57,33 +57,23 @@ class AcademyController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the incoming request
-        $request->validate([
-            'edit_student_name' => 'required|string|max:255',
-            'edit_monthly_price' => 'required|numeric',
-            'edit_age' => 'required|integer',
-            'edit_phone_no' => 'required|string|max:15',
-            'edit_email' => 'required|email',
-            'edit_total_due_left' => 'required|numeric',
-            'edit_joined_date' => 'required|date',
+        // Validate the request data
+        // dd($request);
+        $validatedData = $request->validate([
+            'student_name' => 'required|string|max:255',
+            'monthly_price' => 'required|numeric',
+            'age' => 'required|integer',
+            'phone_no' => 'required|string|max:15',
+            'email' => 'required|email',
+            'total_due_left' => 'required|numeric',
+            'joined_date' => 'required|date',
         ]);
 
         // Find the academy member by ID
         $academyMember = Academy::findOrFail($id);
 
-        // Update the member with the validated data
-        $academyMember->fill($request->only([
-            'edit_student_name',
-            'edit_monthly_price',
-            'edit_age',
-            'edit_phone_no',
-            'edit_email',
-            'edit_total_due_left',
-            'edit_joined_date',
-        ]));
-
-        // Save the changes
-        $academyMember->save();
+        // Update the member with validated data
+        $academyMember->update($validatedData);
 
         return response()->json(['success' => 'Academy member updated successfully.']);
     }

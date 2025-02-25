@@ -17,7 +17,7 @@
             <div class="input-group">
                 <input type="date" id="attendance_date" class="form-control border-0 shadow-sm" />
                 <div class="input-group-append">
-                    <button id="filterAttendance" class="btn btn-primary px-4 py-2">
+                    <button id="filterAttendance" class="btn btn-success px-4 py-2">
                         <i class="fas fa-search"></i> Load Attendance
                     </button>
                 </div>
@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow-sm border-0">
-                <div class="card-header py-3 bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header py-3 bg-success text-white d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold"><i class="fas fa-chalkboard-teacher"></i> Mark Attendance</h6>
                 </div>
                 <div class="table-responsive p-3">
@@ -61,19 +61,19 @@
         </div>
     </div>
 </div>
-
 <script>
 $(document).ready(function() {
     // Set default date to today's date
     var today = new Date().toISOString().split('T')[0];
     $('#attendance_date').val(today);
 
-    // Initialize DataTable
+    // Initialize DataTable with defer render to improve performance
     var attendanceTable = $('#attendanceDataTable').DataTable({
-        paging: false, // Disable pagination to show all records
-        searching: true, // Enable search for filtering
-        info: false, // Disable "Showing X of Y entries"
-        ordering: false, // Disable column ordering
+        paging: false,
+        searching: true,
+        info: false,
+        orderClasses: false,
+        deferRender: true
     });
 
     $('#selectAll').on('change', function() {
@@ -88,50 +88,61 @@ $(document).ready(function() {
         $('#attendance_date').val(selectedDate);
 
         if (!selectedDate) {
-            alert('Please select a date.');
+            toastr.warning('Please select a date.');
             return;
         }
 
         // AJAX to fetch attendance data for the selected date
         $.ajax({
-            url: "{{ route('attendance.fetch') }}", // Adjust the route to fetch data based on the selected date
+            url: "{{ route('attendance.fetch') }}",
             method: "GET",
             data: {
                 date: selectedDate,
             },
             success: function(response) {
-                // Clear previous table data
-                var tableBody = $('#attendanceDataTable tbody');
-                tableBody.empty(); // Clear existing rows
+                // Clear the existing table
+                attendanceTable.clear();
 
                 if (response.attendance.length > 0) {
                     // Populate the table with fetched attendance data
                     response.attendance.forEach(function(item) {
-                        var row = `<tr data-id="${item.academy_member_id}">
-                            <td class="text-center"><input type="checkbox" class="attendance-checkbox" value="${item.academy_member_id}" ${item.status === 1 ? 'checked' : ''}></td>
-                            <td>${item.academy_member_id}</td>
-                            <td>${item.student_name}</td>
-                        </tr>`;
-                        tableBody.append(row);
+                        attendanceTable.row.add([
+                            `<td class="text-center">
+                                <input type="checkbox" class="attendance-checkbox" 
+                                       value="${item.academy_member_id}" 
+                                       ${item.status === 1 ? 'checked' : ''}>
+                            </td>`,
+                            item.academy_member_id,
+                            item.student_name
+                        ]);
                     });
                 } else {
                     // If no attendance data is found, show all academy members as absent
                     response.academyMembers.forEach(function(academy) {
-                        var row = `<tr data-id="${academy.id}">
-                            <td class="text-center"><input type="checkbox" class="attendance-checkbox" value="${academy.id}"></td>
-                            <td>${academy.id}</td>
-                            <td>${academy.student_name}</td>
-                        </tr>`;
-                        tableBody.append(row);
+                        attendanceTable.row.add([
+                            `<td class="text-center">
+                                <input type="checkbox" class="attendance-checkbox" 
+                                       value="${academy.id}">
+                            </td>`,
+                            academy.id,
+                            academy.student_name
+                        ]);
                     });
                 }
-         
 
-        
-                alert('Attendance data loaded for ' + selectedDate);
+                // Redraw the table to show new data and reapply search
+                attendanceTable.draw();
+
+                // Rebind select all and checkbox events
+                $('#selectAll').on('change', function() {
+                    var isChecked = $(this).is(':checked');
+                    $('.attendance-checkbox').prop('checked', isChecked);
+                });
+
+                toastr.info('Attendance data loaded for ' + selectedDate);
             },
             error: function(xhr) {
-                alert('An error occurred while fetching attendance data.');
+                toastr.error('An error occurred while fetching attendance data.');
             }
         });
     });
@@ -147,21 +158,24 @@ $(document).ready(function() {
 
         // AJAX Submission
         $.ajax({
-            url: "{{ route('attendance.submit') }}", // Adjust your route as needed
+            url: "{{ route('attendance.submit') }}",
             method: "POST",
             data: {
                 _token: "{{ csrf_token() }}",
                 present_ids: presentIds,
-                date: $('#attendance_date').val(), // Send the selected date for submission
+                date: $('#attendance_date').val(),
             },
             success: function(response) {
-                alert(response.message || 'Attendance submitted successfully.');
+                toastr.success(response.message || 'Attendance submitted successfully.');
             },
             error: function(xhr) {
-                alert('An error occurred while submitting attendance.');
+                toastr.error('An error occurred while submitting attendance.');
             }
         });
     });
+
+    // Trigger initial load on page load
+    $('#filterAttendance').click();
 });
 </script>
 

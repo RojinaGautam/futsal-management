@@ -189,61 +189,62 @@
                     </button>
                 </div>
                 <form id="editAcademyForm" enctype="multipart/form-data">
-                    <div class="modal-body">
+                    <div class="modal-body px-4">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
-                                    <input type="text" class="form-control" id="edit_student_name" name="edit_student_name" placeholder="Enter full name" required>
+                                    <input type="text" class="form-control rounded-lg shadow-sm" id="edit_student_name" name="student_name" placeholder="Enter full name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
-                                    <input type="number" class="form-control" id="edit_monthly_price" name="edit_monthly_price" placeholder="Enter monthly price" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_monthly_price" name="monthly_price" placeholder="Enter monthly price" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_age" class="font-weight-bold">Age</label>
-                                    <input type="number" class="form-control" id="edit_age" name="edit_age" placeholder="Enter age" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_age" name="age" placeholder="Enter age" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_phone_no" class="font-weight-bold">Phone No</label>
-                                    <input type="text" class="form-control" id="edit_phone_no" name="edit_phone_no" placeholder="Enter phone number" required>
+                                    <input type="text" class="form-control rounded-lg shadow-sm" id="edit_phone_no" name="phone_no" placeholder="Enter phone number" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_email" class="font-weight-bold">Email</label>
-                                    <input type="email" class="form-control" id="edit_email" name="edit_email" placeholder="Enter email address" required>
+                                    <input type="email" class="form-control rounded-lg shadow-sm" id="edit_email" name="email" placeholder="Enter email address" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="edit_total_due_left" name="edit_total_due_left" placeholder="Enter total due left" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_total_due_left" name="total_due_left" placeholder="Enter total due left" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
-                                    <input type="date" class="form-control" id="edit_joined_date" name="edit_joined_date" required>
+                                    <input type="date" class="form-control rounded-lg shadow-sm" id="edit_joined_date" name="joined_date" required>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning text-white">Update Member</button>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary rounded-lg px-4 py-2" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning text-white rounded-lg px-4 py-2">Update Member</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
 
 
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
@@ -506,27 +507,30 @@
             var id = $('#edit_id').val(); // Get the ID of the member being edited
             var formData = new FormData(this); // Create FormData object
 
-            // Log the form data to the console for debugging
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]); // Log each field and its value
-            }
+            // Log all form data in a readable way
+            console.log("Form Data:");
+            formData.forEach((value, key) => {
+                console.log(key + ': ' + value);
+            });
 
             $.ajax({
-                type: 'PATCH', // Use PUT for updating
+                type: 'POST', // Laravel updates accept PATCH/POST
                 url: '/academy/update/' + id, // URL for the update request
                 data: formData,
-                processData: false, // Important for FormData
-                contentType: false, // Important for FormData
+                processData: false, // Don't process FormData
+                contentType: false, // Don't set contentType
+                dataType: "JSON",
                 success: function(response) {
-                    $('#editAcademyModal').modal('hide'); // Hide the modal
-                    table.ajax.reload(); // Reload the DataTable to reflect changes
+                    $('#editAcademyModal').modal('hide'); // Hide modal
+                    table.ajax.reload(); // Reload DataTable
                     toastr.success(response.success); // Show success message
                 },
                 error: function(xhr) {
+                    console.error(xhr.responseText); // Log error details
                     toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
-        });  
+        });
 
 
 
