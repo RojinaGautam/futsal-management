@@ -24,14 +24,17 @@ class CreateUpdateTotalDueLeftProcedure extends Migration
             CREATE PROCEDURE UpdateTotalDueLeft()
             BEGIN
                 UPDATE academy
-                SET total_due_left = total_due_left + monthly_price;
+                SET total_due_left = total_due_left + monthly_price
+                WHERE DATEDIFF(CURDATE(), joined_date) >= 30
+                AND DATEDIFF(CURDATE(), joined_date) % 30 = 0;
             END
         ');
 
-        // Create the event to call the procedure every 2 minutes
+        // Create the event to call the procedure daily
         DB::unprepared('
             CREATE EVENT UpdateTotalDueLeftEvent
-            ON SCHEDULE EVERY 2 MINUTE
+            ON SCHEDULE EVERY 1 DAY
+            STARTS CURRENT_TIMESTAMP
             DO
                 CALL UpdateTotalDueLeft();
         ');

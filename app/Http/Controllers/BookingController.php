@@ -17,9 +17,9 @@ class BookingController extends Controller
     {
         $query = Booking::query();
         
-        // Use filter_date if provided, otherwise use today's date
-        $filterDate = $request->filter_date ?? date('Y-m-d');
-        $query->whereDate('booking_date', $filterDate);
+        if ($request->has('filter_date')) {
+            $query->whereDate('booking_date', $request->filter_date);
+        }
         
         $bookings = $query->get();
         

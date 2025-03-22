@@ -175,55 +175,60 @@
                     </button>
                 </div>
                 <form id="editAcademyForm" enctype="multipart/form-data">
+                    @method('PATCH')
+                    <input type="hidden" name="_method" value="PATCH">
                     <div class="modal-body">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <h5><strong>Member ID:</strong> <span id="display_id"></span></h5>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
-                                    <input type="text" class="form-control" id="edit_student_name" name="edit_student_name" placeholder="Enter full name" required>
+                                    <input type="text" class="form-control" id="edit_student_name" name="student_name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
-                                    <input type="number" class="form-control" id="edit_monthly_price" name="edit_monthly_price" placeholder="Enter monthly price" required>
+                                    <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_age" class="font-weight-bold">Age</label>
-                                    <input type="number" class="form-control" id="edit_age" name="edit_age" placeholder="Enter age" required>
+                                    <input type="number" class="form-control" id="edit_age" name="age" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_phone_no" class="font-weight-bold">Phone No</label>
-                                    <input type="text" class="form-control" id="edit_phone_no" name="edit_phone_no" placeholder="Enter phone number" required>
+                                    <input type="text" class="form-control" id="edit_phone_no" name="phone_no" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_email" class="font-weight-bold">Email</label>
-                                    <input type="email" class="form-control" id="edit_email" name="edit_email" placeholder="Enter email address" required>
+                                    <input type="email" class="form-control" id="edit_email" name="email" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="edit_total_due_left" name="edit_total_due_left" placeholder="Enter total due left" required>
+                                    <input type="number" class="form-control" id="edit_total_due_left" name="total_due_left" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
-                                    <input type="date" class="form-control" id="edit_joined_date" name="edit_joined_date" required>
+                                    <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_image" class="font-weight-bold">Student Image</label>
-                                    <input type="file" class="form-control" id="edit_image" name="edit_image" accept="image/*">
+                                    <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
                                     <div id="current_image" class="mt-2"></div>
                                 </div>
                             </div>
@@ -429,14 +434,14 @@
 
             // Validate payment amount
             if (isNaN(paymentAmount) || paymentAmount <= 0) {
-                toastr.error('Payment amount must be a positive number.'); // Use Toastr for error
+                toastr.error('Payment amount must be a positive number.');
                 return;
             }
 
-            // Make an AJAX call to update the payment
+            
             $.ajax({
                 type: 'PUT',
-                url: '/academy/' + id + '/payment', // Update the URL to point to the new method
+                url: '/academy/' + id + '/payment', 
                 data: {
                     payment_amount: paymentAmount,
                     payment_date: paymentDate,
@@ -444,7 +449,7 @@
                 },
                 success: function(response) {
                     $('#paymentModal').modal('hide');
-                    table.ajax.reload(); // Reload the DataTable
+                    table.ajax.reload();
                     
                     // Show success message with Toastr
                     toastr.success('Payment successful! New Total Due Left: ' + response.new_total_due_left);
@@ -488,6 +493,7 @@
                 success: function(response) {
                     // Populate the form fields with the current data
                     $('#edit_id').val(response.id);
+                    $('#display_id').text(response.id);
                     $('#edit_student_name').val(response.student_name);
                     $('#edit_monthly_price').val(response.monthly_price);
                     $('#edit_age').val(response.age);
@@ -495,9 +501,22 @@
                     $('#edit_email').val(response.email);
                     $('#edit_total_due_left').val(response.total_due_left);
                     $('#edit_joined_date').val(response.joined_date);
+                    
+                    // Show current image if it exists
+                    if (response.image) {
+                        $('#current_image').html(`
+                            <img src="${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
+                            <p class="mt-2">Current Image</p>
+                        `);
+                    } else {
+                        $('#current_image').html(`
+                            <img src="images/default-avatar.png" class="rounded-circle" width="100" height="100" alt="Default Image">
+                            <p class="mt-2">No Current Image</p>
+                        `);
+                    }
                 },
                 error: function() {
-                    toastr.error('Error fetching member details.'); // Use Toastr for error message
+                    toastr.error('Error fetching member details.');
                 }
             });
 
@@ -507,15 +526,9 @@
 
         // Handle edit form submission
         $('#editAcademyForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-
-            var id = $('#edit_id').val(); // Get the ID of the member being edited
-            var formData = new FormData(this); // Create FormData object
-
-            // Log the form data to the console for debugging
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]); // Log each field and its value
-            }
+            e.preventDefault();
+            var id = $('#edit_id').val();
+            var formData = new FormData(this);
 
             $.ajax({
                 type: 'POST',
@@ -523,6 +536,9 @@
                 data: formData,
                 processData: false,
                 contentType: false,
+                headers: {
+                    'X-HTTP-Method-Override': 'POST'
+                },
                 success: function(response) {
                     $('#editAcademyModal').modal('hide');
                     table.ajax.reload();

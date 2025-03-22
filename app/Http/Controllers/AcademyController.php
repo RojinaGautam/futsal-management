@@ -62,43 +62,44 @@ class AcademyController extends Controller
             'email' => $academyMember->email,
             'total_due_left' => $academyMember->total_due_left,
             'joined_date' => $academyMember->joined_date,
-            'payment_history' => $paymentHistory, // Include payment history
+            'payment_history' => $paymentHistory,
+            'image' => $academyMember->image
         ]);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'edit_student_name' => 'required|string|max:255',
-            'edit_monthly_price' => 'required|numeric',
-            'edit_age' => 'required|integer',
-            'edit_phone_no' => 'required|string|max:15',
-            'edit_email' => 'required|email',
-            'edit_total_due_left' => 'required|numeric',
-            'edit_joined_date' => 'required|date',
-            'edit_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'student_name' => 'required|string|max:255',
+            'monthly_price' => 'required|numeric',
+            'age' => 'required|integer',
+            'phone_no' => 'required|string|max:15',
+            'email' => 'required|email',
+            'total_due_left' => 'required|numeric',
+            'joined_date' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $academyMember = Academy::findOrFail($id);
         
         $data = [
-            'student_name' => $request->edit_student_name,
-            'monthly_price' => $request->edit_monthly_price,
-            'age' => $request->edit_age,
-            'phone_no' => $request->edit_phone_no,
-            'email' => $request->edit_email,
-            'total_due_left' => $request->edit_total_due_left,
-            'joined_date' => $request->edit_joined_date,
+            'student_name' => $request->student_name,
+            'monthly_price' => $request->monthly_price,
+            'age' => $request->age,
+            'phone_no' => $request->phone_no,
+            'email' => $request->email,
+            'total_due_left' => $request->total_due_left,
+            'joined_date' => $request->joined_date,
         ];
 
         // Handle image upload
-        if ($request->hasFile('edit_image')) {
+        if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($academyMember->image && file_exists(public_path($academyMember->image))) {
                 unlink(public_path($academyMember->image));
             }
 
-            $image = $request->file('edit_image');
+            $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images/academy'), $imageName);
             $data['image'] = 'images/academy/' . $imageName;
