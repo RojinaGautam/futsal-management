@@ -175,48 +175,46 @@
                     </button>
                 </div>
                 <form id="editAcademyForm" enctype="multipart/form-data">
-                    @method('PATCH')
+                    @method('POST')
                     <input type="hidden" name="_method" value="PATCH">
                     <div class="modal-body">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <h5><strong>Member ID:</strong> <span id="display_id"></span></h5>
-                            </div>
+                           
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
-                                    <input type="text" class="form-control" id="edit_student_name" name="student_name" required>
+                                    <input type="text" class="form-control" id="edit_student_name" name="student_name" placeholder="Enter full name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
-                                    <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" required>
+                                    <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" placeholder="Enter monthly price" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_age" class="font-weight-bold">Age</label>
-                                    <input type="number" class="form-control" id="edit_age" name="age" required>
+                                    <input type="number" class="form-control" id="edit_age" name="age" placeholder="Enter age" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_phone_no" class="font-weight-bold">Phone No</label>
-                                    <input type="text" class="form-control" id="edit_phone_no" name="phone_no" required>
+                                    <input type="text" class="form-control" id="edit_phone_no" name="phone_no" placeholder="Enter phone number" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_email" class="font-weight-bold">Email</label>
-                                    <input type="email" class="form-control" id="edit_email" name="email" required>
+                                    <input type="email" class="form-control" id="edit_email" name="email" placeholder="Enter email address" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="edit_total_due_left" name="total_due_left" required>
+                                    <input type="number" class="form-control" id="edit_total_due_left" name="total_due_left" placeholder="Enter total due left" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -225,7 +223,7 @@
                                     <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                        <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_image" class="font-weight-bold">Student Image</label>
                                     <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
