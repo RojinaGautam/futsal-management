@@ -13,6 +13,12 @@ class CreateUpdateTotalDueLeftProcedure extends Migration
      */
     public function up()
     {
+        // Drop the event if it exists
+        DB::unprepared('DROP EVENT IF EXISTS UpdateTotalDueLeftEvent');
+
+        // Drop the procedure if it exists
+        DB::unprepared('DROP PROCEDURE IF EXISTS UpdateTotalDueLeft');
+
         // Create the stored procedure
         DB::unprepared('
             CREATE PROCEDURE UpdateTotalDueLeft()

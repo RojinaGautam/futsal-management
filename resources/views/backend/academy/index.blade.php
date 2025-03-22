@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-end">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-end justify-content-sm-start">
                     <!-- <h6 class="m-0 font-weight-bold text-primary">Academy Members</h6> -->
                     <button type="button" class="btn btn-primary justify-content-end " data-toggle="modal" data-target="#addAcademyModal">
                         Add Academy Member
@@ -27,6 +27,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>UN-ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Total Due Left</th>
                                 <th>Actions</th>
@@ -64,27 +65,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .modal-header {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .modal-content {
-            border-radius: 10px;
-        }
-
-        #memberDetails p {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        #memberDetails p strong {
-            color: #343a40;
-        }
-    </style>
-
 
     <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
@@ -167,6 +147,12 @@
                                     <input type="date" class="form-control" id="joined_date" name="joined_date" required>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="image" class="font-weight-bold">Student Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -232,6 +218,13 @@
                                 <div class="form-group">
                                     <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
                                     <input type="date" class="form-control" id="edit_joined_date" name="edit_joined_date" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="edit_image" class="font-weight-bold">Student Image</label>
+                                    <input type="file" class="form-control" id="edit_image" name="edit_image" accept="image/*">
+                                    <div id="current_image" class="mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -326,6 +319,14 @@
                     data: 'id'
                 },
                 {
+                    data: 'image',
+                    render: function(data, type, row) {
+                        return data ? 
+                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` : 
+                            `<img src="images/default-avatar.png" class="rounded-circle" width="50" height="50" alt="Default Image">`;
+                    }
+                },
+                {
                     data: 'student_name'
                 },
                 {
@@ -377,6 +378,12 @@
                     if (response) {
                         // Populate the modal with member details
                         $('#memberDetails').html(`
+                            <div class="text-center mb-4">
+                                ${response.image ? 
+                                    `<img src="${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
+                                    `<img src="images/default-avatar.png" class="rounded-circle" width="150" height="150" alt="Default Image">`
+                                }
+                            </div>
                             <p><strong>Name:</strong> ${response.student_name}</p>
                             <p><strong>Monthly Price:</strong> ${response.monthly_price}</p>
                             <p><strong>Age:</strong> ${response.age}</p>
@@ -452,18 +459,17 @@
         // Handle add form submission
         $('#addAcademyForm').on('submit', function(e) {
             e.preventDefault();
-            var formData = new FormData(this); // Create FormData object
+            var formData = new FormData(this);
             $.ajax({
                 type: 'POST',
                 url: '{{ route("academy.store") }}',
                 data: formData,
-                processData: false, // Important for file uploads
-                contentType: false, // Important for file uploads
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     $('#addAcademyModal').modal('hide');
                     table.ajax.reload();
-                    $('#successMessage').text(response.success);
-                    $('#successModal').modal('show'); // Show the success modal
+                    toastr.success('Academy member added successfully!');
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);
@@ -512,15 +518,15 @@
             }
 
             $.ajax({
-                type: 'PATCH', // Use PUT for updating
-                url: '/academy/update/' + id, // URL for the update request
+                type: 'POST',
+                url: '/academy/update/' + id,
                 data: formData,
-                processData: false, // Important for FormData
-                contentType: false, // Important for FormData
+                processData: false,
+                contentType: false,
                 success: function(response) {
-                    $('#editAcademyModal').modal('hide'); // Hide the modal
-                    table.ajax.reload(); // Reload the DataTable to reflect changes
-                    toastr.success(response.success); // Show success message
+                    $('#editAcademyModal').modal('hide');
+                    table.ajax.reload();
+                    toastr.success('Academy member updated successfully!');
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);

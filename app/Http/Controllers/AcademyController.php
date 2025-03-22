@@ -23,9 +23,20 @@ class AcademyController extends Controller
             'email' => 'required|email|unique:academy',
             'total_due_left' => 'required|numeric',
             'joined_date' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        Academy::create($request->all());
+        $data = $request->all();
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/academy'), $imageName);
+            $data['image'] = 'images/academy/' . $imageName;
+        }
+
+        Academy::create($data);
 
         return response()->json(['success' => 'Academy member added successfully.']);
     }
@@ -57,7 +68,6 @@ class AcademyController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate the incoming request
         $request->validate([
             'edit_student_name' => 'required|string|max:255',
             'edit_monthly_price' => 'required|numeric',
@@ -66,24 +76,35 @@ class AcademyController extends Controller
             'edit_email' => 'required|email',
             'edit_total_due_left' => 'required|numeric',
             'edit_joined_date' => 'required|date',
+            'edit_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        // Find the academy member by ID
         $academyMember = Academy::findOrFail($id);
+        
+        $data = [
+            'student_name' => $request->edit_student_name,
+            'monthly_price' => $request->edit_monthly_price,
+            'age' => $request->edit_age,
+            'phone_no' => $request->edit_phone_no,
+            'email' => $request->edit_email,
+            'total_due_left' => $request->edit_total_due_left,
+            'joined_date' => $request->edit_joined_date,
+        ];
 
-        // Update the member with the validated data
-        $academyMember->fill($request->only([
-            'edit_student_name',
-            'edit_monthly_price',
-            'edit_age',
-            'edit_phone_no',
-            'edit_email',
-            'edit_total_due_left',
-            'edit_joined_date',
-        ]));
+        // Handle image upload
+        if ($request->hasFile('edit_image')) {
+            // Delete old image if exists
+            if ($academyMember->image && file_exists(public_path($academyMember->image))) {
+                unlink(public_path($academyMember->image));
+            }
 
-        // Save the changes
-        $academyMember->save();
+            $image = $request->file('edit_image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/academy'), $imageName);
+            $data['image'] = 'images/academy/' . $imageName;
+        }
+
+        $academyMember->update($data);
 
         return response()->json(['success' => 'Academy member updated successfully.']);
     }
