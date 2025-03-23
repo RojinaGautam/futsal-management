@@ -770,7 +770,7 @@ a:focus {
 }
 
 .sidebar hr.sidebar-divider {
-  margin: 1rem 0 1rem 0
+  margin: 0.5rem 0 0.5rem 0
 }
 
 .sidebar .sidebar-heading {
@@ -806,7 +806,7 @@ a:focus {
 }
 
 .sidebar.toggled hr.sidebar-divider {
-  margin: 0 0 1rem 0
+  margin: 0 0 0.5rem 0
 }
 
 .sidebar.toggled #sidebarToggle::after {
@@ -1032,7 +1032,7 @@ a:focus {
   }
 
   .sidebar.toggled hr.sidebar-divider {
-      margin: 1rem 0 1rem 0
+      margin: 0.5rem 0 0.5rem 0
   }
 
   .sidebar.toggled .sidebar-heading {
@@ -1072,7 +1072,7 @@ a:focus {
   }
 
   .sidebar hr.sidebar-divider {
-      margin: 1rem 0 1rem 0
+      margin: 0.5rem 0 0.5rem 0
   }
 
   .topbar .navbar-search {
