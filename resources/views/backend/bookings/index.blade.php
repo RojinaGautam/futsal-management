@@ -102,7 +102,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="total_amount_paid" class="font-weight-bold">Amount Paid</label>
-                                    <input type="number" step="0.01" class="form-control" id="total_amount_paid" name="total_amount_paid" required>
+                                    <input type="number" step="0.01" value="0" class="form-control" id="total_amount_paid" name="total_amount_paid" required>
                                 </div>
                             </div>
                         </div>
