@@ -4,18 +4,80 @@
 <div class="container-fluid" id="container-wrapper">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Academy Data</h1>
-            <ol class="breadcrumb">
+        <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="./">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Academy</li>
-            </ol>
+        </ol>
     </div>
 
- 
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Filter Academy Members</h6>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleFilters">
+                        <i class="fas fa-filter"></i> Show/Hide Filters
+                    </button>
+                </div>
+                <div class="card-body" id="filterPanel" style="display: none;">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="nameFilter" class="font-weight-bold">Name</label>
+                                    <input type="text" class="form-control" id="nameFilter" placeholder="Filter by name">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="dueFilter" class="font-weight-bold">Due Amount</label>
+                                    <select class="form-control" id="dueFilter">
+                                        <option value="">All</option>
+                                        <option value="0">No Due (0)</option>
+                                        <option value="1-1000">1-1000</option>
+                                        <option value="1001-5000">1001-5000</option>
+                                        <option value="5001+">Above 5000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="startDate" class="font-weight-bold">Joined Date (From)</label>
+                                    <input type="date" class="form-control" id="startDate">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="endDate" class="font-weight-bold">Joined Date (To)</label>
+                                    <input type="date" class="form-control" id="endDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" id="clearFilterButton">
+                                        <i class="fas fa-eraser"></i> Clear Filters
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="filterButton">
+                                        <i class="fas fa-search"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- DataTable -->
     <div class="row">
         <div class="col-lg-12">
+
             <div class="card mb-4">
+
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-end justify-content-sm-start">
                     <!-- <h6 class="m-0 font-weight-bold text-primary">Academy Members</h6> -->
                     <button type="button" class="btn btn-primary justify-content-end " data-toggle="modal" data-target="#addAcademyModal">
@@ -180,7 +242,7 @@
                     <div class="modal-body px-4">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
-                           
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
@@ -223,7 +285,7 @@
                                     <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
                                 </div>
                             </div>
-                        <div class="col-md-12">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_image" class="font-weight-bold">Student Image</label>
                                     <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
@@ -307,6 +369,9 @@
 
 <script>
     $(document).ready(function() {
+        $('#toggleFilters').on('click', function() {
+            $('#filterPanel').slideToggle();
+        });
 
         $.ajaxSetup({
             headers: {
@@ -317,7 +382,13 @@
         var table = $('#academyDataTable').DataTable({
             ajax: {
                 url: '{{ route("academy.data") }}',
-                dataSrc: ''
+                dataSrc: '',
+                data: function(d) {
+                    d.nameFilter = $('#nameFilter').val();
+                    d.dueFilter = $('#dueFilter').val();
+                    d.startDate = $('#startDate').val();
+                    d.endDate = $('#endDate').val();
+                }
             },
             columns: [{
                     data: 'id'
@@ -325,8 +396,8 @@
                 {
                     data: 'image',
                     render: function(data, type, row) {
-                        return data ? 
-                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` : 
+                        return data ?
+                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` :
                             `<img src="images/default-avatar.png" class="rounded-circle" width="50" height="50" alt="Default Image">`;
                     }
                 },
@@ -415,6 +486,20 @@
             $('#viewDetailsModal').modal('show');
         });
 
+        $('#filterButton').on('click', function() {
+            table.ajax.reload();
+            toastr.info('Filters applied!');
+        });
+
+        // Handle clear filter button click
+        $('#clearFilterButton').on('click', function() {
+            $('#nameFilter').val('');
+            $('#dueFilter').val('');
+            $('#startDate').val('');
+            $('#endDate').val('');
+            table.ajax.reload();
+            toastr.info('Filters cleared!');
+        });
         // Handle pay button click
         $('#academyDataTable').on('click', '.pay-btn', function() {
             var id = $(this).data('id');
@@ -437,10 +522,10 @@
                 return;
             }
 
-            
+
             $.ajax({
                 type: 'PUT',
-                url: '/academy/' + id + '/payment', 
+                url: '/academy/' + id + '/payment',
                 data: {
                     payment_amount: paymentAmount,
                     payment_date: paymentDate,
@@ -449,7 +534,7 @@
                 success: function(response) {
                     $('#paymentModal').modal('hide');
                     table.ajax.reload();
-                    
+
                     // Show success message with Toastr
                     toastr.success('Payment successful! New Total Due Left: ' + response.new_total_due_left);
                 },
@@ -517,7 +602,7 @@
                     $('#edit_email').val(response.email);
                     $('#edit_total_due_left').val(response.total_due_left);
                     $('#edit_joined_date').val(response.joined_date);
-                    
+
                     // Show current image if it exists
                     if (response.image) {
                         $('#current_image').html(`
@@ -620,7 +705,7 @@
             $('input[type="checkbox"]').prop('checked', isChecked);
         });
 
-        
+
     });
 </script>
 @endsection

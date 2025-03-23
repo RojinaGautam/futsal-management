@@ -41,9 +41,57 @@ class AcademyController extends Controller
         return response()->json(['success' => 'Academy member added successfully.']);
     }
 
-    public function getAcademyData()
+    // Add this to your controller that handles the academy.data route
+    public function getAcademyData(Request $request)
     {
-        return Academy::all(); // You can customize this to return paginated data or specific fields
+        $query = Academy::query();
+
+        // Apply name filter if provided
+        if ($request->has('nameFilter') && !empty($request->nameFilter)) {
+            $query->where('student_name', 'LIKE', '%' . $request->nameFilter . '%');
+        }
+
+        // Apply due amount filter if provided
+        if ($request->has('dueFilter') && !empty($request->dueFilter)) {
+            switch ($request->dueFilter) {
+                case '0':
+                    $query->where('total_due_left', 0);
+                    break;
+                case '1-1000':
+                    $query->whereBetween('total_due_left', [1, 1000]);
+                    break;
+                case '1001-5000':
+                    $query->whereBetween('total_due_left', [1001, 5000]);
+                    break;
+                case '5001+':
+                    $query->where('total_due_left', '>', 5000);
+                    break;
+            }
+        }
+
+        // Apply date filters if provided
+        if ($request->has('startDate') && !empty($request->startDate)) {
+            $query->whereDate('joined_date', '>=', $request->startDate);
+        }
+
+        if ($request->has('endDate') && !empty($request->endDate)) {
+            $query->whereDate('joined_date', '<=', $request->endDate);
+        }
+
+        // Get the filtered results
+        $academyMembers = $query->get();
+
+        // Process the data as needed
+        foreach ($academyMembers as $member) {
+            // Format image URL if needed
+            if ($member->image) {
+                $member->image = asset('storage/' . $member->image);
+            }
+            
+            // Add any other data processing needed
+        }
+
+        return response()->json($academyMembers);
     }
 
     public function show($id)
