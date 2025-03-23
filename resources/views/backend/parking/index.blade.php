@@ -1,0 +1,342 @@
+@extends('backend.layout.app')
+
+@section('content')
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Parking Data</h1>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="./">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Parking</li>
+        </ol>
+    </div>
+
+    <!-- DataTable -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-end justify-content-sm-start">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParkingModal">
+                        Add Parking Record
+                    </button>
+                </div>
+                <div class="table-responsive p-3">
+                    <table class="table align-items-center table-flush table-hover" id="parkingDataTable" style="width: 100%;">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone Number</th>
+                                <th>Address</th>
+                                <th>Monthly Price</th>
+                                <th>Total Due</th>
+                                <th>Actions</th>
+                                <th>Pay</th> <!-- New Column for Pay Button -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated here via DataTables -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Make a Payment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="paymentForm">
+                    <div class="modal-body">
+                        <div id="paymentMemberDetails"></div>
+                        <div class="form-group">
+                            <label for="payment_amount">Payment Amount</label>
+                            <input type="number" class="form-control" id="payment_amount" name="payment_amount" required>
+                        </div>
+                        <input type="hidden" id="payment_parking_id" name="parking_id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Pay</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Parking Modal -->
+    <div class="modal fade" id="addParkingModal" tabindex="-1" role="dialog" aria-labelledby="addParkingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold" id="addParkingModalLabel">Add Parking Record</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addParkingForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="name" class="font-weight-bold">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_number" class="font-weight-bold">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="font-weight-bold">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="monthly_price" class="font-weight-bold">Monthly Price</label>
+                            <input type="number" class="form-control" id="monthly_price" name="monthly_price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="total_due" class="font-weight-bold">Total Due</label>
+                            <input type="number" class="form-control" id="total_due" name="total_due" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Parking Modal -->
+    <div class="modal fade" id="editParkingModal" tabindex="-1" role="dialog" aria-labelledby="editParkingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title font-weight-bold" id="editParkingModalLabel">Edit Parking Record</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editParkingForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_id" name="id">
+                        <div class="form-group">
+                            <label for="edit_name" class="font-weight-bold">Name</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_phone_number" class="font-weight-bold">Phone Number</label>
+                            <input type="text" class="form-control" id="edit_phone_number" name="phone_number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_address" class="font-weight-bold">Address</label>
+                            <input type="text" class="form-control" id="edit_address" name="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
+                            <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_total_due" class="font-weight-bold">Total Due</label>
+                            <input type="number" class="form-control" id="edit_total_due" name="total_due" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning">Update Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this parking record? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        // Initialize DataTable
+        var table = $('#parkingDataTable').DataTable({
+            ajax: {
+                url: '{{ route("parkings.data") }}',
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'phone_number' },
+                { data: 'address' },
+                { data: 'monthly_price' },
+                { data: 'total_due' },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-sm edit-btn btn-outline-warning mr-2" data-id="${row.id}" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm delete-btn btn-outline-danger" data-id="${row.id}" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                    }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-success pay-btn" data-id="${row.id}" data-total="${row.total_due}" title="Pay">Pay</button>
+                        `;
+                    }
+                }
+            ]
+        });
+
+        // Handle pay button click
+        $('#parkingDataTable').on('click', '.pay-btn', function() {
+            var id = $(this).data('id');
+            var totalDue = $(this).data('total');
+            $('#paymentMemberDetails').html(`<p>Paying for parking ID: ${id}. Total Due: ${totalDue}</p>`);
+            $('#payment_parking_id').val(id);
+            $('#paymentModal').modal('show');
+        });
+
+        // Handle payment form submission
+        $('#paymentForm').on('submit', function(e) {
+            e.preventDefault();
+            var id = $('#payment_parking_id').val();
+            var paymentAmount = $('#payment_amount').val();
+
+            $.ajax({
+                type: 'PUT',
+                url: '/parkings/' + id + '/payment',
+                data: {
+                    payment_amount: paymentAmount,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    $('#paymentModal').modal('hide');
+                    table.ajax.reload();
+                    toastr.success('Payment successful! New Total Due: ' + response.new_total_due);
+                },
+                error: function(xhr) {
+                    toastr.error('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+
+        // Handle add form submission
+        $('#addParkingForm').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '{{ route("parkings.store") }}',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#addParkingModal').modal('hide');
+                    table.ajax.reload();
+                    toastr.success('Parking record added successfully!');
+                },
+                error: function(xhr) {
+                    toastr.error('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+
+        // Handle edit button click
+        $('#parkingDataTable').on('click', '.edit-btn', function() {
+            var id = $(this).data('id');
+            $.ajax({
+                type: 'GET',
+                url: '/parkings/' + id,
+                success: function(response) {
+                    $('#edit_id').val(response.id);
+                    $('#edit_name').val(response.name);
+                    $('#edit_phone_number').val(response.phone_number);
+                    $('#edit_address').val(response.address);
+                    $('#edit_monthly_price').val(response.monthly_price);
+                    $('#edit_total_due').val(response.total_due);
+                    $('#editParkingModal').modal('show');
+                },
+                error: function() {
+                    toastr.error('Error fetching parking record details.');
+                }
+            });
+        });
+
+        // Handle edit form submission
+        $('#editParkingForm').on('submit', function(e) {
+            e.preventDefault();
+            var id = $('#edit_id').val();
+            $.ajax({
+                type: 'PATCH',
+                url: '/parkings/update/' + id,
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#editParkingModal').modal('hide');
+                    table.ajax.reload();
+                    toastr.success('Parking record updated successfully!');
+                },
+                error: function(xhr) {
+                    toastr.error('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+
+        // Handle delete button click
+        $('#parkingDataTable').on('click', '.delete-btn', function() {
+            var id = $(this).data('id');
+            $('#confirmDeleteBtn').data('id', id);
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        // Handle delete confirmation
+        $('#confirmDeleteBtn').on('click', function() {
+            var id = $(this).data('id');
+            $.ajax({
+                type: 'DELETE',
+                url: '/parkings/' + id,
+                success: function(response) {
+                    $('#deleteConfirmationModal').modal('hide');
+                    table.ajax.reload();
+                    toastr.success('Parking record deleted successfully!');
+                },
+                error: function(xhr) {
+                    toastr.error('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        });
+    });
+</script>
+@endsection

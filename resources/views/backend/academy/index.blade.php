@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-end">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-end justify-content-sm-start">
                     <!-- <h6 class="m-0 font-weight-bold text-primary">Academy Members</h6> -->
                     <button type="button" class="btn btn-primary justify-content-end " data-toggle="modal" data-target="#addAcademyModal">
                         Add Academy Member
@@ -27,6 +27,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>UN-ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Total Due Left</th>
                                 <th>Actions</th>
@@ -64,27 +65,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .modal-header {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .modal-content {
-            border-radius: 10px;
-        }
-
-        #memberDetails p {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        #memberDetails p strong {
-            color: #343a40;
-        }
-    </style>
-
 
     <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
@@ -167,6 +147,12 @@
                                     <input type="date" class="form-control" id="joined_date" name="joined_date" required>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="image" class="font-weight-bold">Student Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -189,9 +175,12 @@
                     </button>
                 </div>
                 <form id="editAcademyForm" enctype="multipart/form-data">
+                    @method('POST')
+                    <input type="hidden" name="_method" value="PATCH">
                     <div class="modal-body px-4">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
+                           
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
@@ -231,7 +220,14 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
-                                    <input type="date" class="form-control rounded-lg shadow-sm" id="edit_joined_date" name="joined_date" required>
+                                    <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
+                                </div>
+                            </div>
+                        <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="edit_image" class="font-weight-bold">Student Image</label>
+                                    <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
+                                    <div id="current_image" class="mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -327,6 +323,14 @@
                     data: 'id'
                 },
                 {
+                    data: 'image',
+                    render: function(data, type, row) {
+                        return data ? 
+                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` : 
+                            `<img src="images/default-avatar.png" class="rounded-circle" width="50" height="50" alt="Default Image">`;
+                    }
+                },
+                {
                     data: 'student_name'
                 },
                 {
@@ -378,6 +382,12 @@
                     if (response) {
                         // Populate the modal with member details
                         $('#memberDetails').html(`
+                            <div class="text-center mb-4">
+                                ${response.image ? 
+                                    `<img src="${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
+                                    `<img src="images/default-avatar.png" class="rounded-circle" width="150" height="150" alt="Default Image">`
+                                }
+                            </div>
                             <p><strong>Name:</strong> ${response.student_name}</p>
                             <p><strong>Monthly Price:</strong> ${response.monthly_price}</p>
                             <p><strong>Age:</strong> ${response.age}</p>
@@ -423,14 +433,14 @@
 
             // Validate payment amount
             if (isNaN(paymentAmount) || paymentAmount <= 0) {
-                toastr.error('Payment amount must be a positive number.'); // Use Toastr for error
+                toastr.error('Payment amount must be a positive number.');
                 return;
             }
 
-            // Make an AJAX call to update the payment
+            
             $.ajax({
                 type: 'PUT',
-                url: '/academy/' + id + '/payment', // Update the URL to point to the new method
+                url: '/academy/' + id + '/payment', 
                 data: {
                     payment_amount: paymentAmount,
                     payment_date: paymentDate,
@@ -438,14 +448,31 @@
                 },
                 success: function(response) {
                     $('#paymentModal').modal('hide');
-                    table.ajax.reload(); // Reload the DataTable
+                    table.ajax.reload();
                     
                     // Show success message with Toastr
                     toastr.success('Payment successful! New Total Due Left: ' + response.new_total_due_left);
                 },
-                error: function(xhr) {
-                    // Show error message with Toastr
-                    toastr.error('Error: ' + xhr.responseJSON.message);
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+
+                    let errorMessage = 'An unexpected error occurred. Please try again.';
+
+                    if (xhr.responseJSON) {
+                        errorMessage = xhr.responseJSON.message || xhr.responseJSON.error || errorMessage;
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Network error. Please check your internet connection.';
+                    } else if (xhr.status === 400) {
+                        errorMessage = 'Invalid request.';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'You do not have permission to perform this action.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Booking not found.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Server error. Please contact support.';
+                    }
+
+                    toastr.error('Error: ' + errorMessage);
                 }
             });
         });
@@ -453,18 +480,17 @@
         // Handle add form submission
         $('#addAcademyForm').on('submit', function(e) {
             e.preventDefault();
-            var formData = new FormData(this); // Create FormData object
+            var formData = new FormData(this);
             $.ajax({
                 type: 'POST',
                 url: '{{ route("academy.store") }}',
                 data: formData,
-                processData: false, // Important for file uploads
-                contentType: false, // Important for file uploads
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     $('#addAcademyModal').modal('hide');
                     table.ajax.reload();
-                    $('#successMessage').text(response.success);
-                    $('#successModal').modal('show'); // Show the success modal
+                    toastr.success('Academy member added successfully!');
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);
@@ -483,6 +509,7 @@
                 success: function(response) {
                     // Populate the form fields with the current data
                     $('#edit_id').val(response.id);
+                    $('#display_id').text(response.id);
                     $('#edit_student_name').val(response.student_name);
                     $('#edit_monthly_price').val(response.monthly_price);
                     $('#edit_age').val(response.age);
@@ -490,9 +517,22 @@
                     $('#edit_email').val(response.email);
                     $('#edit_total_due_left').val(response.total_due_left);
                     $('#edit_joined_date').val(response.joined_date);
+                    
+                    // Show current image if it exists
+                    if (response.image) {
+                        $('#current_image').html(`
+                            <img src="${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
+                            <p class="mt-2">Current Image</p>
+                        `);
+                    } else {
+                        $('#current_image').html(`
+                            <img src="images/default-avatar.png" class="rounded-circle" width="100" height="100" alt="Default Image">
+                            <p class="mt-2">No Current Image</p>
+                        `);
+                    }
                 },
                 error: function() {
-                    toastr.error('Error fetching member details.'); // Use Toastr for error message
+                    toastr.error('Error fetching member details.');
                 }
             });
 
@@ -525,9 +565,26 @@
                     table.ajax.reload(); // Reload DataTable
                     toastr.success(response.success); // Show success message
                 },
-                error: function(xhr) {
-                    console.error(xhr.responseText); // Log error details
-                    toastr.error('Error: ' + xhr.responseJSON.message);
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+
+                    let errorMessage = 'An unexpected error occurred. Please try again.';
+
+                    if (xhr.responseJSON) {
+                        errorMessage = xhr.responseJSON.message || xhr.responseJSON.error || errorMessage;
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Network error. Please check your internet connection.';
+                    } else if (xhr.status === 400) {
+                        errorMessage = 'Invalid request.';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'You do not have permission to perform this action.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Booking not found.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Server error. Please contact support.';
+                    }
+
+                    toastr.error('Error: ' + errorMessage);
                 }
             });
         });

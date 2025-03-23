@@ -57,7 +57,7 @@
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="/parking">
+        <a class="nav-link" href="/parkings">
           <i class="fas fa-fw fa-parking"></i>
           <span>Parking</span></a>
       </li>
