@@ -4,18 +4,80 @@
 <div class="container-fluid" id="container-wrapper">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Academy Data</h1>
-            <ol class="breadcrumb">
+        <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="./">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Academy</li>
-            </ol>
+        </ol>
     </div>
 
- 
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Filter Academy Members</h6>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleFilters">
+                        <i class="fas fa-filter"></i> Show/Hide Filters
+                    </button>
+                </div>
+                <div class="card-body" id="filterPanel" style="display: none;">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="nameFilter" class="font-weight-bold">Name</label>
+                                    <input type="text" class="form-control" id="nameFilter" placeholder="Filter by name">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="dueFilter" class="font-weight-bold">Due Amount</label>
+                                    <select class="form-control" id="dueFilter">
+                                        <option value="">All</option>
+                                        <option value="0">No Due (0)</option>
+                                        <option value="1-1000">1-1000</option>
+                                        <option value="1001-5000">1001-5000</option>
+                                        <option value="5001+">Above 5000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="startDate" class="font-weight-bold">Joined Date (From)</label>
+                                    <input type="date" class="form-control" id="startDate">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="endDate" class="font-weight-bold">Joined Date (To)</label>
+                                    <input type="date" class="form-control" id="endDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" id="clearFilterButton">
+                                        <i class="fas fa-eraser"></i> Clear Filters
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="filterButton">
+                                        <i class="fas fa-search"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- DataTable -->
     <div class="row">
         <div class="col-lg-12">
+
             <div class="card mb-4">
+
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-end justify-content-sm-start">
                     <!-- <h6 class="m-0 font-weight-bold text-primary">Academy Members</h6> -->
                     <button type="button" class="btn btn-primary justify-content-end " data-toggle="modal" data-target="#addAcademyModal">
@@ -177,44 +239,44 @@
                 <form id="editAcademyForm" enctype="multipart/form-data">
                     @method('POST')
                     <input type="hidden" name="_method" value="PATCH">
-                    <div class="modal-body">
+                    <div class="modal-body px-4">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="row">
-                           
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_student_name" class="font-weight-bold">Student Name</label>
-                                    <input type="text" class="form-control" id="edit_student_name" name="student_name" placeholder="Enter full name" required>
+                                    <input type="text" class="form-control rounded-lg shadow-sm" id="edit_student_name" name="student_name" placeholder="Enter full name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_monthly_price" class="font-weight-bold">Monthly Price</label>
-                                    <input type="number" class="form-control" id="edit_monthly_price" name="monthly_price" placeholder="Enter monthly price" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_monthly_price" name="monthly_price" placeholder="Enter monthly price" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_age" class="font-weight-bold">Age</label>
-                                    <input type="number" class="form-control" id="edit_age" name="age" placeholder="Enter age" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_age" name="age" placeholder="Enter age" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_phone_no" class="font-weight-bold">Phone No</label>
-                                    <input type="text" class="form-control" id="edit_phone_no" name="phone_no" placeholder="Enter phone number" required>
+                                    <input type="text" class="form-control rounded-lg shadow-sm" id="edit_phone_no" name="phone_no" placeholder="Enter phone number" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_email" class="font-weight-bold">Email</label>
-                                    <input type="email" class="form-control" id="edit_email" name="email" placeholder="Enter email address" required>
+                                    <input type="email" class="form-control rounded-lg shadow-sm" id="edit_email" name="email" placeholder="Enter email address" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="edit_total_due_left" name="total_due_left" placeholder="Enter total due left" required>
+                                    <input type="number" class="form-control rounded-lg shadow-sm" id="edit_total_due_left" name="total_due_left" placeholder="Enter total due left" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -223,7 +285,7 @@
                                     <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
                                 </div>
                             </div>
-                        <div class="col-md-12">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="edit_image" class="font-weight-bold">Student Image</label>
                                     <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
@@ -232,14 +294,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-warning text-white">Update Member</button>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary rounded-lg px-4 py-2" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning text-white rounded-lg px-4 py-2">Update Member</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
 
 
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
@@ -306,6 +369,9 @@
 
 <script>
     $(document).ready(function() {
+        $('#toggleFilters').on('click', function() {
+            $('#filterPanel').slideToggle();
+        });
 
         $.ajaxSetup({
             headers: {
@@ -316,7 +382,13 @@
         var table = $('#academyDataTable').DataTable({
             ajax: {
                 url: '{{ route("academy.data") }}',
-                dataSrc: ''
+                dataSrc: '',
+                data: function(d) {
+                    d.nameFilter = $('#nameFilter').val();
+                    d.dueFilter = $('#dueFilter').val();
+                    d.startDate = $('#startDate').val();
+                    d.endDate = $('#endDate').val();
+                }
             },
             columns: [{
                     data: 'id'
@@ -324,8 +396,8 @@
                 {
                     data: 'image',
                     render: function(data, type, row) {
-                        return data ? 
-                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` : 
+                        return data ?
+                            `<img src="${data}" class="rounded-circle" width="50" height="50" alt="Student Image">` :
                             `<img src="images/default-avatar.png" class="rounded-circle" width="50" height="50" alt="Default Image">`;
                     }
                 },
@@ -414,6 +486,20 @@
             $('#viewDetailsModal').modal('show');
         });
 
+        $('#filterButton').on('click', function() {
+            table.ajax.reload();
+            toastr.info('Filters applied!');
+        });
+
+        // Handle clear filter button click
+        $('#clearFilterButton').on('click', function() {
+            $('#nameFilter').val('');
+            $('#dueFilter').val('');
+            $('#startDate').val('');
+            $('#endDate').val('');
+            table.ajax.reload();
+            toastr.info('Filters cleared!');
+        });
         // Handle pay button click
         $('#academyDataTable').on('click', '.pay-btn', function() {
             var id = $(this).data('id');
@@ -436,10 +522,10 @@
                 return;
             }
 
-            
+
             $.ajax({
                 type: 'PUT',
-                url: '/academy/' + id + '/payment', 
+                url: '/academy/' + id + '/payment',
                 data: {
                     payment_amount: paymentAmount,
                     payment_date: paymentDate,
@@ -448,13 +534,30 @@
                 success: function(response) {
                     $('#paymentModal').modal('hide');
                     table.ajax.reload();
-                    
+
                     // Show success message with Toastr
                     toastr.success('Payment successful! New Total Due Left: ' + response.new_total_due_left);
                 },
-                error: function(xhr) {
-                    // Show error message with Toastr
-                    toastr.error('Error: ' + xhr.responseJSON.message);
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+
+                    let errorMessage = 'An unexpected error occurred. Please try again.';
+
+                    if (xhr.responseJSON) {
+                        errorMessage = xhr.responseJSON.message || xhr.responseJSON.error || errorMessage;
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Network error. Please check your internet connection.';
+                    } else if (xhr.status === 400) {
+                        errorMessage = 'Invalid request.';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'You do not have permission to perform this action.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Booking not found.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Server error. Please contact support.';
+                    }
+
+                    toastr.error('Error: ' + errorMessage);
                 }
             });
         });
@@ -499,7 +602,7 @@
                     $('#edit_email').val(response.email);
                     $('#edit_total_due_left').val(response.total_due_left);
                     $('#edit_joined_date').val(response.joined_date);
-                    
+
                     // Show current image if it exists
                     if (response.image) {
                         $('#current_image').html(`
@@ -524,29 +627,52 @@
 
         // Handle edit form submission
         $('#editAcademyForm').on('submit', function(e) {
-            e.preventDefault();
-            var id = $('#edit_id').val();
-            var formData = new FormData(this);
+            e.preventDefault(); // Prevent the default form submission
+
+            var id = $('#edit_id').val(); // Get the ID of the member being edited
+            var formData = new FormData(this); // Create FormData object
+
+            // Log all form data in a readable way
+            console.log("Form Data:");
+            formData.forEach((value, key) => {
+                console.log(key + ': ' + value);
+            });
 
             $.ajax({
-                type: 'POST',
-                url: '/academy/update/' + id,
+                type: 'POST', // Laravel updates accept PATCH/POST
+                url: '/academy/update/' + id, // URL for the update request
                 data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-HTTP-Method-Override': 'POST'
-                },
+                processData: false, // Don't process FormData
+                contentType: false, // Don't set contentType
+                dataType: "JSON",
                 success: function(response) {
-                    $('#editAcademyModal').modal('hide');
-                    table.ajax.reload();
-                    toastr.success('Academy member updated successfully!');
+                    $('#editAcademyModal').modal('hide'); // Hide modal
+                    table.ajax.reload(); // Reload DataTable
+                    toastr.success(response.success); // Show success message
                 },
-                error: function(xhr) {
-                    toastr.error('Error: ' + xhr.responseJSON.message);
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+
+                    let errorMessage = 'An unexpected error occurred. Please try again.';
+
+                    if (xhr.responseJSON) {
+                        errorMessage = xhr.responseJSON.message || xhr.responseJSON.error || errorMessage;
+                    } else if (xhr.status === 0) {
+                        errorMessage = 'Network error. Please check your internet connection.';
+                    } else if (xhr.status === 400) {
+                        errorMessage = 'Invalid request.';
+                    } else if (xhr.status === 403) {
+                        errorMessage = 'You do not have permission to perform this action.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Booking not found.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Server error. Please contact support.';
+                    }
+
+                    toastr.error('Error: ' + errorMessage);
                 }
             });
-        });  
+        });
 
 
 
@@ -579,7 +705,7 @@
             $('input[type="checkbox"]').prop('checked', isChecked);
         });
 
-        
+
     });
 </script>
 @endsection

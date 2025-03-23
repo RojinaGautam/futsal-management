@@ -173,7 +173,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="edit_total_amount_paid" class="font-weight-bold">Amount Paid</label>
-                                    <input type="number" step="0.01" class="form-control" id="edit_total_amount_paid" name="total_amount_paid" required>
+                                    <input type="number" step="any" class="form-control" id="edit_total_amount_paid" name="total_amount_paid" required>
                                 </div>
                             </div>
                         </div>
@@ -311,6 +311,7 @@ $(document).ready(function() {
             }
         ]
     });
+
 
     // Add event listener for date filter
     $('#filter_date').on('change', function() {
@@ -453,6 +454,7 @@ $(document).ready(function() {
                 toastr.error('Error: ' + xhr.responseJSON.message);
             }
         });
+
     });
 });
 </script>
