@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <link href="{{ asset('img/logo/logo.png') }}" rel="icon">
-  <title>RAVE - Dashboard</title>
+  <title>DD - DashboardD</title>
   <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
   <link href="{{ asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">
