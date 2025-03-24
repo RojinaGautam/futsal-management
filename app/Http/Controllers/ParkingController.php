@@ -27,11 +27,72 @@ class ParkingController extends Controller
         return response()->json(['success' => 'Parking record added successfully.']);
     }
 
-    public function getParkingData()
+    public function getParkingData(Request $request)
     {
-        return Parking::all(); // You can customize this to return paginated data or specific fields
+        $query = Parking::query();
+    
+        // Apply name filter if provided
+        if ($request->has('nameFilter') && !empty($request->nameFilter)) {
+            $query->where('name', 'LIKE', '%' . $request->nameFilter . '%');
+        }
+    
+        // Apply address filter if provided
+        if ($request->has('addressFilter') && !empty($request->addressFilter)) {
+            $query->where('address', 'LIKE', '%' . $request->addressFilter . '%');
+        }
+    
+        if ($request->dueFilter == '0') {
+            $query->where('total_due', 0);
+        }
+        // Apply due amount filter if provided
+        if ($request->has('dueFilter') && !empty($request->dueFilter)) {
+            switch ($request->dueFilter) {
+                case '0':
+                    $query->where('total_due', 0);
+                    break;
+                case '1-1000':
+                    $query->whereBetween('total_due', [1, 1000]);
+                    break;
+                case '1001-5000':
+                    $query->whereBetween('total_due', [1001, 5000]);
+                    break;
+                case '5001+':
+                    $query->where('total_due', '>', 5000);
+                    break;
+            }
+        }
+    
+        // Apply price range filter if provided
+        if ($request->has('priceFilter') && !empty($request->priceFilter)) {
+            switch ($request->priceFilter) {
+                case '0-500':
+                    $query->whereBetween('monthly_price', [0, 500]);
+                    break;
+                case '501-1000':
+                    $query->whereBetween('monthly_price', [501, 1000]);
+                    break;
+                case '1001+':
+                    $query->where('monthly_price', '>', 1000);
+                    break;
+            }
+        }
+    
+        // Apply date filters if needed (if you have any date fields like created_at)
+        if ($request->has('startDate') && !empty($request->startDate)) {
+            $query->whereDate('created_at', '>=', $request->startDate);
+        }
+    
+        if ($request->has('endDate') && !empty($request->endDate)) {
+            $query->whereDate('created_at', '<=', $request->endDate);
+        }
+    
+        // Get the filtered results
+        $parkingEntries = $query->get();
+        
+        // Process any data if needed before returning
+        
+        return response()->json($parkingEntries);
     }
-
     public function show($id)
     {
         $parking = Parking::findOrFail($id);

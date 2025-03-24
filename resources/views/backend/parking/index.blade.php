@@ -10,6 +10,88 @@
         </ol>
     </div>
 
+    <!-- Filter Section -->
+    <!-- Filter Section for Parking Data -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Filter Parking Entries</h6>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleParkingFilters">
+                        <i class="fas fa-filter"></i> Show/Hide Filters
+                    </button>
+                </div>
+                <div class="card-body" id="parkingFilterPanel" style="display: none;">
+                    <form id="parkingFilterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="nameFilter" class="font-weight-bold">Name</label>
+                                    <input type="text" class="form-control" id="nameFilter" placeholder="Filter by name">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="addressFilter" class="font-weight-bold">Address</label>
+                                    <input type="text" class="form-control" id="addressFilter" placeholder="Filter by address">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="dueFilter" class="font-weight-bold">Due Amount</label>
+                                    <select class="form-control" id="dueFilter">
+                                        <option value="">All</option>
+                                        <option value="0">No Due (0)</option>
+                                        <option value="1-1000">1-1000</option>
+                                        <option value="1001-5000">1001-5000</option>
+                                        <option value="5001+">Above 5000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="priceFilter" class="font-weight-bold">Monthly Price</label>
+                                    <select class="form-control" id="priceFilter">
+                                        <option value="">All</option>
+                                        <option value="0-500">0-500</option>
+                                        <option value="501-1000">501-1000</option>
+                                        <option value="1001+">Above 1000</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="startDate" class="font-weight-bold">Date From</label>
+                                    <input type="date" class="form-control" id="startDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="endDate" class="font-weight-bold">Date To</label>
+                                    <input type="date" class="form-control" id="endDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary mr-2" id="clearParkingFilterButton">
+                                        <i class="fas fa-eraser"></i> Clear Filters
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="applyParkingFilterButton">
+                                        <i class="fas fa-search"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- DataTable -->
     <div class="row">
         <div class="col-lg-12">
@@ -186,11 +268,24 @@
             }
         });
 
+        $('#toggleParkingFilters').on('click', function() {
+            $('#parkingFilterPanel').slideToggle();
+        });
+
+
         // Initialize DataTable
         var table = $('#parkingDataTable').DataTable({
             ajax: {
                 url: '{{ route("parkings.data") }}',
-                dataSrc: ''
+                dataSrc: '',
+                data: function(d) {
+                    d.nameFilter = $('#nameFilter').val();
+                    d.addressFilter = $('#addressFilter').val();
+                    d.dueFilter = $('#dueFilter').val();
+                    d.priceFilter = $('#priceFilter').val();
+                    d.startDate = $('#startDate').val();
+                    d.endDate = $('#endDate').val();
+                }
             },
             columns: [
                 { data: 'id' },
@@ -221,6 +316,23 @@
                     }
                 }
             ]
+        });
+
+        $('#applyParkingFilterButton').on('click', function() {
+            table.ajax.reload();
+            toastr.info('Filters applied!');
+        });
+
+        // Handle clear filter button click
+        $('#clearParkingFilterButton').on('click', function() {
+            $('#nameFilter').val('');
+            $('#addressFilter').val('');
+            $('#dueFilter').val('');
+            $('#priceFilter').val('');
+            $('#startDate').val('');
+            $('#endDate').val('');
+            table.ajax.reload();
+            toastr.info('Filters cleared!');
         });
 
         // Handle pay button click
