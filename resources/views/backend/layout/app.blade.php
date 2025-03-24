@@ -418,7 +418,7 @@
       opacity: 1;
       color: #5c936b;
     }
-
+/*  */
     /* Add a subtle pulse animation to selected icon */
     .sidebar .nav-item .nav-link.selected:hover i {
       animation: pulse 1s infinite;
