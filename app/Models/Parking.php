@@ -16,7 +16,7 @@ class Parking extends Model
         'phone_number',
         'address',
         'monthly_price',
-        'total_due', // Include total_due
+        'total_due',
         'payment_history',
     ];
 

@@ -96,7 +96,17 @@ class ParkingController extends Controller
     public function show($id)
     {
         $parking = Parking::findOrFail($id);
-        return response()->json($parking);
+        $paymentHistory = json_decode($parking->payment_history, true);
+        
+        return response()->json([
+            'id' => $parking->id,
+            'name' => $parking->name,
+            'phone_number' => $parking->phone_number,
+            'address' => $parking->address,
+            'monthly_price' => $parking->monthly_price,
+            'total_due' => $parking->total_due,
+            'payment_history' => $paymentHistory
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -143,9 +153,18 @@ class ParkingController extends Controller
         // Update the total due
         $parking->total_due = $newTotalDue;
 
+        // Add payment to history
+        $parking->addPaymentHistory(
+            $request->payment_amount,
+            date('Y-m-d')  // Today's date
+        );
+
         // Save the changes
         $parking->save();
 
-        return response()->json(['new_total_due' => $newTotalDue, 'success' => 'Payment processed successfully!']);
+        return response()->json([
+            'new_total_due' => $newTotalDue,
+            'success' => 'Payment processed successfully!'
+        ]);
     }
 }

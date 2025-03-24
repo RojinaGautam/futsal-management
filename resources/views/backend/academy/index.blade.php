@@ -199,12 +199,6 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="total_due_left" class="font-weight-bold">Total Due Left</label>
-                                    <input type="number" class="form-control" id="total_due_left" name="total_due_left" value="0" required>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
                                     <label for="joined_date" class="font-weight-bold">Joined Date</label>
                                     <input type="date" class="form-control" id="joined_date" name="joined_date" required>
                                 </div>
@@ -213,6 +207,37 @@
                                 <div class="form-group">
                                     <label for="image" class="font-weight-bold">Student Image</label>
                                     <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- Payment Type Selection -->
+                            <div class="col-12 mt-3">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Payment Type</label>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="paymentTypeDue" name="payment_type" class="custom-control-input" value="due" checked>
+                                        <label class="custom-control-label" for="paymentTypeDue">Due Amount</label>
+                                    </div>
+                                    <div class="custom-control custom-radio mt-2">
+                                        <input type="radio" id="paymentTypeAdvance" name="payment_type" class="custom-control-input" value="advance">
+                                        <label class="custom-control-label" for="paymentTypeAdvance">Advance Payment</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Payment Form -->
+                            <div class="col-12">
+                                <div id="dueAmountForm">
+                                    <div class="form-group">
+                                        <label for="total_due_left" class="font-weight-bold">Total Due Amount</label>
+                                        <input type="number" class="form-control" id="total_due_left" name="total_due_left" required>
+                                    </div>
+                                </div>
+                                <div id="advanceAmountForm" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="advance_amount" class="font-weight-bold">Advance Amount</label>
+                                        <input type="number" class="form-control" id="advance_amount" name="advance_amount">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +430,14 @@
                     data: 'student_name'
                 },
                 {
-                    data: 'total_due_left'
+                    data: 'total_due_left',
+                    render: function(data, type, row) {
+                        if (data < 0) {
+                            return `<span class="text-success">${Math.abs(data)} (Advance)</span>`;
+                        } else {
+                            return `<span class="text-danger">${data}</span>`;
+                        }
+                    }
                 },
                 {
                     data: null,
@@ -464,7 +496,11 @@
                             <p><strong>Age:</strong> ${response.age}</p>
                             <p><strong>Phone No:</strong> ${response.phone_no}</p>
                             <p><strong>Email:</strong> ${response.email}</p>
-                            <p><strong>Total Due Left:</strong> ${response.total_due_left}</p>
+                            <p><strong>Payment Status:</strong> ${
+                                response.total_due_left < 0 
+                                    ? `<span class="text-success">${Math.abs(response.total_due_left)} (Advance)</span>`
+                                    : `<span class="text-danger">${response.total_due_left}</span>`
+                            }</p>
                             <p><strong>Joined Date:</strong> ${response.joined_date}</p>
                             <p><strong>Payment History:</strong></p>
                             <ul>
@@ -562,10 +598,33 @@
             });
         });
 
-        // Handle add form submission
+        // Add these new handlers
+        $('input[name="payment_type"]').change(function() {
+            if (this.value === 'due') {
+                $('#dueAmountForm').show();
+                $('#advanceAmountForm').hide();
+                $('#total_due_left').prop('required', true);
+                $('#advance_amount').prop('required', false);
+            } else {
+                $('#dueAmountForm').hide();
+                $('#advanceAmountForm').show();
+                $('#total_due_left').prop('required', false);
+                $('#advance_amount').prop('required', true);
+            }
+        });
+
+        // Update the add form submission
         $('#addAcademyForm').on('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(this);
+            
+            // Handle advance payment
+            if (formData.get('payment_type') === 'advance') {
+                formData.set('total_due_left', -Math.abs(formData.get('advance_amount')));
+                formData.delete('advance_amount');
+            }
+            formData.delete('payment_type');
+
             $.ajax({
                 type: 'POST',
                 url: '{{ route("academy.store") }}',
@@ -576,6 +635,11 @@
                     $('#addAcademyModal').modal('hide');
                     table.ajax.reload();
                     toastr.success('Academy member added successfully!');
+                    
+                    // Reset the form
+                    $('#addAcademyForm')[0].reset();
+                    $('#dueAmountForm').show();
+                    $('#advanceAmountForm').hide();
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);

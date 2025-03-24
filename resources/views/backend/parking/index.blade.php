@@ -164,25 +164,69 @@
                 </div>
                 <form id="addParkingForm">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="name" class="font-weight-bold">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                        <!-- Basic Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="font-weight-bold">Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone_number" class="font-weight-bold">Phone Number</label>
+                                    <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="phone_number" class="font-weight-bold">Phone Number</label>
-                            <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="address" class="font-weight-bold">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="monthly_price" class="font-weight-bold">Monthly Price</label>
+                                    <input type="number" class="form-control" id="monthly_price" name="monthly_price" required>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="address" class="font-weight-bold">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" required>
+
+                        <!-- Payment Type Selection -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Payment Type</label>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="paymentTypeDue" name="payment_type" class="custom-control-input" value="due" checked>
+                                        <label class="custom-control-label" for="paymentTypeDue">Due Amount</label>
+                                    </div>
+                                    <div class="custom-control custom-radio mt-2">
+                                        <input type="radio" id="paymentTypeAdvance" name="payment_type" class="custom-control-input" value="advance">
+                                        <label class="custom-control-label" for="paymentTypeAdvance">Advance Payment</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="monthly_price" class="font-weight-bold">Monthly Price</label>
-                            <input type="number" class="form-control" id="monthly_price" name="monthly_price" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="total_due" class="font-weight-bold">Total Due</label>
-                            <input type="number" class="form-control" id="total_due" name="total_due" required>
+
+                        <!-- Dynamic Payment Form -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div id="dueAmountForm">
+                                    <div class="form-group">
+                                        <label for="total_due" class="font-weight-bold">Total Due Amount</label>
+                                        <input type="number" class="form-control" id="total_due" name="total_due" required>
+                                    </div>
+                                </div>
+                                <div id="advanceAmountForm" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="advance_amount" class="font-weight-bold">Advance Amount</label>
+                                        <input type="number" class="form-control" id="advance_amount" name="advance_amount">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -257,6 +301,27 @@
     </div>
 </div>
 
+<!-- Add this after your existing modals -->
+<div class="modal fade" id="viewDetailsModal" tabindex="-1" role="dialog" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title font-weight-bold" id="viewDetailsModalLabel">Parking Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="parkingDetails" class="px-3">
+                    <!-- Details will be populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 
@@ -293,17 +358,31 @@
                 { data: 'phone_number' },
                 { data: 'address' },
                 { data: 'monthly_price' },
-                { data: 'total_due' },
+                { 
+                    data: 'total_due',
+                    render: function(data, type, row) {
+                        if (data < 0) {
+                            return `<span class="text-success">${Math.abs(data)} (Advance)</span>`;
+                        } else {
+                            return `<span class="text-danger">${data}</span>`;
+                        }
+                    }
+                },
                 {
                     data: null,
                     render: function(data, type, row) {
                         return `
-                            <button class="btn btn-sm edit-btn btn-outline-warning mr-2" data-id="${row.id}" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm delete-btn btn-outline-danger" data-id="${row.id}" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <div class="d-flex">
+                                <button class="btn btn-sm view-btn btn-outline-info mr-2" data-id="${row.id}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm edit-btn btn-outline-warning mr-2" data-id="${row.id}" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm delete-btn btn-outline-danger" data-id="${row.id}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         `;
                     }
                 },
@@ -339,7 +418,14 @@
         $('#parkingDataTable').on('click', '.pay-btn', function() {
             var id = $(this).data('id');
             var totalDue = $(this).data('total');
-            $('#paymentMemberDetails').html(`<p>Paying for parking ID: ${id}. Total Due: ${totalDue}</p>`);
+            var displayAmount = totalDue < 0 
+                ? `${Math.abs(totalDue)} (Advance)` 
+                : totalDue;
+            
+            $('#paymentMemberDetails').html(`
+                <p>Paying for parking ID: ${id}</p>
+                <p>Current Status: <span class="${totalDue < 0 ? 'text-success' : 'text-danger'}">${displayAmount}</span></p>
+            `);
             $('#payment_parking_id').val(id);
             $('#paymentModal').modal('show');
         });
@@ -368,17 +454,57 @@
             });
         });
 
-        // Handle add form submission
+        // Handle payment type radio button change
+        $('input[name="payment_type"]').change(function() {
+            if (this.value === 'due') {
+                $('#dueAmountForm').show();
+                $('#advanceAmountForm').hide();
+                $('#total_due').prop('required', true);
+                $('#advance_amount').prop('required', false);
+            } else {
+                $('#dueAmountForm').hide();
+                $('#advanceAmountForm').show();
+                $('#total_due').prop('required', false);
+                $('#advance_amount').prop('required', true);
+            }
+        });
+
+        // Modify the add form submission
         $('#addParkingForm').on('submit', function(e) {
             e.preventDefault();
+            
+            let formData = $(this).serializeArray();
+            let paymentType = $('input[name="payment_type"]:checked').val();
+            let finalData = {};
+
+            // Convert serialized array to object
+            formData.forEach(item => {
+                finalData[item.name] = item.value;
+            });
+
+            // Handle the total_due based on payment type
+            if (paymentType === 'advance') {
+                // Store advance payment as negative value
+                finalData.total_due = -Math.abs(finalData.advance_amount);
+                delete finalData.advance_amount; // Remove the advance_amount field
+            }
+
+            // Remove payment_type from final data
+            delete finalData.payment_type;
+
             $.ajax({
                 type: 'POST',
                 url: '{{ route("parkings.store") }}',
-                data: $(this).serialize(),
+                data: finalData,
                 success: function(response) {
                     $('#addParkingModal').modal('hide');
                     table.ajax.reload();
                     toastr.success('Parking record added successfully!');
+                    
+                    // Reset the form
+                    $('#addParkingForm')[0].reset();
+                    $('#dueAmountForm').show();
+                    $('#advanceAmountForm').hide();
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);
@@ -448,6 +574,58 @@
                     toastr.error('Error: ' + xhr.responseJSON.message);
                 }
             });
+        });
+
+        // Add this handler for the view button
+        $('#parkingDataTable').on('click', '.view-btn', function() {
+            var id = $(this).data('id');
+            
+            // Clear previous details and show loading
+            $('#parkingDetails').html('<p>Loading details...</p>');
+            
+            $.ajax({
+                type: 'GET',
+                url: '/parkings/' + id,
+                success: function(response) {
+                    if (response) {
+                        $('#parkingDetails').html(`
+                            <div class="mb-4">
+                                <h6 class="font-weight-bold">Basic Information</h6>
+                                <p><strong>Name:</strong> ${response.name}</p>
+                                <p><strong>Phone Number:</strong> ${response.phone_number}</p>
+                                <p><strong>Address:</strong> ${response.address}</p>
+                                <p><strong>Monthly Price:</strong> ${response.monthly_price}</p>
+                                <p><strong>Payment Status:</strong> ${
+                                    response.total_due < 0 
+                                        ? `<span class="text-success">${Math.abs(response.total_due)} (Advance)</span>`
+                                        : `<span class="text-danger">${response.total_due}</span>`
+                                }</p>
+                            </div>
+                            <div>
+                                <h6 class="font-weight-bold">Payment History</h6>
+                                ${response.payment_history && response.payment_history.length > 0 
+                                    ? '<ul class="list-unstyled">' + 
+                                        response.payment_history.map(payment => 
+                                            `<li class="mb-2">
+                                                <span class="badge badge-success">Amount: ${payment.amount}</span>
+                                                <span class="badge badge-info">Date: ${payment.date}</span>
+                                            </li>`
+                                        ).join('') + 
+                                        '</ul>'
+                                    : '<p>No payment history available.</p>'
+                                }
+                            </div>
+                        `);
+                    } else {
+                        $('#parkingDetails').html('<p class="text-danger">Unable to fetch details.</p>');
+                    }
+                },
+                error: function() {
+                    $('#parkingDetails').html('<p class="text-danger">Error fetching details. Please try again.</p>');
+                }
+            });
+
+            $('#viewDetailsModal').modal('show');
         });
     });
 </script>
