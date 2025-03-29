@@ -3,14 +3,13 @@
 @section('content')
 <div class="container-fluid" id="container-wrapper">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Parkings in CI/CD</h1>
+        <h1 class="h3 mb-0 text-gray-800">Parkings Details</h1>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="./">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Parking</li>
         </ol>
     </div>
 
-    <!-- Filter Section -->
     <!-- Filter Section for Parking Data -->
     <div class="row mb-4">
         <div class="col-lg-12">
@@ -111,8 +110,9 @@
                                 <th>Address</th>
                                 <th>Monthly Price</th>
                                 <th>Total Due</th>
+                                <th>Joined Date</th>
                                 <th>Actions</th>
-                                <th>Pay</th> <!-- New Column for Pay Button -->
+                                <th>Pay</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -192,42 +192,20 @@
                                     <input type="number" class="form-control" id="monthly_price" name="monthly_price" required>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Payment Type Selection -->
-                        <div class="row mt-3">
-                            <div class="col-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Payment Type</label>
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="paymentTypeDue" name="payment_type" class="custom-control-input" value="due" checked>
-                                        <label class="custom-control-label" for="paymentTypeDue">Due Amount</label>
-                                    </div>
-                                    <div class="custom-control custom-radio mt-2">
-                                        <input type="radio" id="paymentTypeAdvance" name="payment_type" class="custom-control-input" value="advance">
-                                        <label class="custom-control-label" for="paymentTypeAdvance">Advance Payment</label>
-                                    </div>
+                                    <label for="total_due" class="font-weight-bold">Total Due Amount</label>
+                                    <input type="number" class="form-control" id="total_due" name="total_due" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="joined_date" class="font-weight-bold">Joined Date</label>
+                                    <input type="date" class="form-control" id="joined_date" name="joined_date" required>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Dynamic Payment Form -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div id="dueAmountForm">
-                                    <div class="form-group">
-                                        <label for="total_due" class="font-weight-bold">Total Due Amount</label>
-                                        <input type="number" class="form-control" id="total_due" name="total_due" required>
-                                    </div>
-                                </div>
-                                <div id="advanceAmountForm" style="display: none;">
-                                    <div class="form-group">
-                                        <label for="advance_amount" class="font-weight-bold">Advance Amount</label>
-                                        <input type="number" class="form-control" id="advance_amount" name="advance_amount">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
@@ -270,6 +248,10 @@
                         <div class="form-group">
                             <label for="edit_total_due" class="font-weight-bold">Total Due</label>
                             <input type="number" class="form-control" id="edit_total_due" name="total_due" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_joined_date" class="font-weight-bold">Joined Date</label>
+                            <input type="date" class="form-control" id="edit_joined_date" name="joined_date" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -368,6 +350,7 @@
                         }
                     }
                 },
+                { data: 'joined_date' },
                 {
                     data: null,
                     render: function(data, type, row) {
@@ -454,43 +437,17 @@
             });
         });
 
-        // Handle payment type radio button change
-        $('input[name="payment_type"]').change(function() {
-            if (this.value === 'due') {
-                $('#dueAmountForm').show();
-                $('#advanceAmountForm').hide();
-                $('#total_due').prop('required', true);
-                $('#advance_amount').prop('required', false);
-            } else {
-                $('#dueAmountForm').hide();
-                $('#advanceAmountForm').show();
-                $('#total_due').prop('required', false);
-                $('#advance_amount').prop('required', true);
-            }
-        });
-
         // Modify the add form submission
         $('#addParkingForm').on('submit', function(e) {
             e.preventDefault();
             
             let formData = $(this).serializeArray();
-            let paymentType = $('input[name="payment_type"]:checked').val();
             let finalData = {};
 
             // Convert serialized array to object
             formData.forEach(item => {
                 finalData[item.name] = item.value;
             });
-
-            // Handle the total_due based on payment type
-            if (paymentType === 'advance') {
-                // Store advance payment as negative value
-                finalData.total_due = -Math.abs(finalData.advance_amount);
-                delete finalData.advance_amount; // Remove the advance_amount field
-            }
-
-            // Remove payment_type from final data
-            delete finalData.payment_type;
 
             $.ajax({
                 type: 'POST',
@@ -503,8 +460,6 @@
                     
                     // Reset the form
                     $('#addParkingForm')[0].reset();
-                    $('#dueAmountForm').show();
-                    $('#advanceAmountForm').hide();
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);
@@ -519,12 +474,18 @@
                 type: 'GET',
                 url: '/parkings/' + id,
                 success: function(response) {
+                    console.log('Joined Date:', response.joined_date);
+                    console.log('ID:',response.id);
+                    console.log(response);
+                    
+                     
                     $('#edit_id').val(response.id);
                     $('#edit_name').val(response.name);
                     $('#edit_phone_number').val(response.phone_number);
                     $('#edit_address').val(response.address);
                     $('#edit_monthly_price').val(response.monthly_price);
                     $('#edit_total_due').val(response.total_due);
+                    $('#edit_joined_date').val(response.joined_date);
                     $('#editParkingModal').modal('show');
                 },
                 error: function() {
@@ -595,6 +556,7 @@
                                 <p><strong>Phone Number:</strong> ${response.phone_number}</p>
                                 <p><strong>Address:</strong> ${response.address}</p>
                                 <p><strong>Monthly Price:</strong> ${response.monthly_price}</p>
+                                <p><strong>Joined Date:</strong> ${response.joined_date}</p>
                                 <p><strong>Payment Status:</strong> ${
                                     response.total_due < 0 
                                         ? `<span class="text-success">${Math.abs(response.total_due)} (Advance)</span>`

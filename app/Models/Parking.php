@@ -18,6 +18,11 @@ class Parking extends Model
         'monthly_price',
         'total_due',
         'payment_history',
+        'joined_date',
+    ];
+
+    protected $casts = [
+        'joined_date' => 'date:Y-m-d',
     ];
 
     public function addPaymentHistory($amount, $date)

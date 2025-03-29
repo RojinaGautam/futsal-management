@@ -106,7 +106,6 @@
     </div>
 
     <!-- Modal for Viewing Details -->
-    <!-- Modal for Viewing Details -->
     <div class="modal fade" id="viewDetailsModal" tabindex="-1" role="dialog" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content border-0 shadow-lg">
@@ -209,37 +208,13 @@
                                     <input type="file" class="form-control" id="image" name="image" accept="image/*">
                                 </div>
                             </div>
-
-                            <!-- Payment Type Selection -->
-                            <div class="col-12 mt-3">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Payment Type</label>
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="paymentTypeDue" name="payment_type" class="custom-control-input" value="due" checked>
-                                        <label class="custom-control-label" for="paymentTypeDue">Due Amount</label>
-                                    </div>
-                                    <div class="custom-control custom-radio mt-2">
-                                        <input type="radio" id="paymentTypeAdvance" name="payment_type" class="custom-control-input" value="advance">
-                                        <label class="custom-control-label" for="paymentTypeAdvance">Advance Payment</label>
-                                    </div>
+                                    <label for="total_due_left" class="font-weight-bold">Total Due Amount</label>
+                                        <input type="number" class="form-control" id="total_due_left" name="total_due_left" required>
                                 </div>
                             </div>
 
-                            <!-- Dynamic Payment Form -->
-                            <div class="col-12">
-                                <div id="dueAmountForm">
-                                    <div class="form-group">
-                                        <label for="total_due_left" class="font-weight-bold">Total Due Amount</label>
-                                        <input type="number" class="form-control" id="total_due_left" name="total_due_left" required>
-                                    </div>
-                                </div>
-                                <div id="advanceAmountForm" style="display: none;">
-                                    <div class="form-group">
-                                        <label for="advance_amount" class="font-weight-bold">Advance Amount</label>
-                                        <input type="number" class="form-control" id="advance_amount" name="advance_amount">
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -483,11 +458,13 @@
                 success: function(response) {
                     // Check if response contains the expected data
                     if (response) {
+
+                        console.log("Image URL:", response.image);
                         // Populate the modal with member details
                         $('#memberDetails').html(`
                             <div class="text-center mb-4">
                                 ${response.image ? 
-                                    `<img src="${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
+                                    `<img src="/storage/${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
                                     `<img src="images/default-avatar.png" class="rounded-circle" width="150" height="150" alt="Default Image">`
                                 }
                             </div>
@@ -598,20 +575,7 @@
             });
         });
 
-        // Add these new handlers
-        $('input[name="payment_type"]').change(function() {
-            if (this.value === 'due') {
-                $('#dueAmountForm').show();
-                $('#advanceAmountForm').hide();
-                $('#total_due_left').prop('required', true);
-                $('#advance_amount').prop('required', false);
-            } else {
-                $('#dueAmountForm').hide();
-                $('#advanceAmountForm').show();
-                $('#total_due_left').prop('required', false);
-                $('#advance_amount').prop('required', true);
-            }
-        });
+    
 
         // Update the add form submission
         $('#addAcademyForm').on('submit', function(e) {
@@ -638,8 +602,6 @@
                     
                     // Reset the form
                     $('#addAcademyForm')[0].reset();
-                    $('#dueAmountForm').show();
-                    $('#advanceAmountForm').hide();
                 },
                 error: function(xhr) {
                     toastr.error('Error: ' + xhr.responseJSON.message);
@@ -670,7 +632,7 @@
                     // Show current image if it exists
                     if (response.image) {
                         $('#current_image').html(`
-                            <img src="${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
+                            <img src="/storage/${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
                             <p class="mt-2">Current Image</p>
                         `);
                     } else {
