@@ -9,6 +9,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ParkingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StaffAttendanceController;
+use App\Http\Controllers\DashboardController;
 
 // Public routes
 Route::get('/', function () {
@@ -27,9 +28,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Protected routes - any authenticated user can access
 Route::middleware(['auth'])->group(function () {
     // Dashboard access for all authenticated users
-    Route::get('/admin', function () {
-        return view('backend.index');
-    });
+    Route::get('/admin', [DashboardController::class,'index']);
 
     // Later we can add role-specific middleware for specific features
     // Example:

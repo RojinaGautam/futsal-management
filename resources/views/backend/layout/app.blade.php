@@ -75,6 +75,12 @@
           <span>Users</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/staff-attendance">
+          <i class="fas fa-fw fa-calendar-check"></i>
+          <span>Attendance</span>
+        </a>
+      </li>
       <div class="nav-separator"></div>
     </ul>
     <!-- Sidebar -->

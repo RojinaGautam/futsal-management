@@ -171,6 +171,28 @@
             </div>
         </div>
     </div>
+
+    <!-- View User Details Modal -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1" role="dialog" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDetailsModalLabel">User Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="userDetailsContent">
+                        <!-- User details will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -208,8 +230,17 @@
                     data: null,
                     render: function(data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-outline-info edit-btn" data-id="${row.id}">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${row.id}">Delete</button>
+                                                       <div class="d-flex">
+                                <button class="btn btn-sm view-btn btn-outline-info mr-2" data-id="${row.id}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm edit-btn btn-outline-warning mr-2" data-id="${row.id}" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm delete-btn  btn-outline-danger" data-id="${row.id}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         `;
                     }
                 },
@@ -257,10 +288,16 @@
                     $('#edit_name').val(response.name);
                     $('#edit_email').val(response.email);
                     $('#edit_phone_number').val(response.phone_number);
-                    $('#edit_role').val(response.roles[0].name);
+
+                    // Check if roles exist and set the role
+                    if (response.roles.length > 0) {
+                        $('#edit_role').val(response.roles[0].name);
+                    } else {
+                        $('#edit_role').val(''); // Set to empty or a default value
+                    }
 
                     // Check if the user is staff and populate salary and payment date
-                    if (response.roles[0].name === 'staff') {
+                    if (response.roles.length > 0 && response.roles[0].name === 'staff') {
                         $('#edit_salarySection').show();
                         $('#edit_paymentDateSection').show();
 
@@ -369,6 +406,36 @@
                 $('#salarySection').hide();
                 $('#paymentDateSection').hide();
             }
+        });
+
+        // Handle view button click
+        $('#userDataTable').on('click', '.view-btn', function() {
+            var id = $(this).data('id');
+
+            // Fetch the current data for the selected user
+            $.ajax({
+                type: 'GET',
+                url: '/users/' + id,
+                success: function(response) {
+                    // Populate the modal with user details
+                    $('#userDetailsContent').html(`
+                        <p><strong>Name:</strong> ${response.name}</p>
+                        <p><strong>Email:</strong> ${response.email}</p>
+                        <p><strong>Phone Number:</strong> ${response.phone_number}</p>
+                        <p><strong>Role:</strong> ${response.roles.length > 0 ? response.roles[0].name : 'No role assigned'}</p>
+                        <p><strong>Failed Attempts:</strong> ${response.failed_attempts}</p>
+                        <p><strong>Salary Details:</strong></p>
+                        <ul>
+                            ${response.salaries.length > 0 ? response.salaries.map(salary => `<li>Monthly Salary: ${salary.monthly_salary}, Payment Date: ${salary.payment_date}</li>`).join('') : '<li>No salary records available.</li>'}
+                        </ul>
+                    `);
+                    // Show the modal
+                    $('#viewDetailsModal').modal('show');
+                },
+                error: function() {
+                    toastr.error('Error fetching user details.');
+                }
+            });
         });
     });
 </script>
