@@ -13,7 +13,7 @@ class TenantUserSeeder extends Seeder
         $faker = Faker::create();
 
         // Seed fake users for the tenant
-        foreach (range(1, 10) as $index) {  // Adjust the range as needed
+        foreach (range(1, 3) as $index) {  // Adjust the range as needed
             User::create([
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
