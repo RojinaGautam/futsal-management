@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Stancl\Tenancy\Database\Models\Tenant;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\Artisan;
 
 class SetupTenant extends Command
@@ -59,6 +59,15 @@ class SetupTenant extends Command
             '--database' => 'tenant',
             '--path' => 'database/migrations/tenant',
             '--force' => true,
+        ]);
+        $this->line(Artisan::output());
+
+        $this->info("Seeding fake users for tenant");
+        
+        Artisan::call('db:seed', [
+            '--class' => 'TenantUserSeeder', // Make sure the seeder is created correctly
+            '--database' => 'tenant', // Specify tenant's database
+            '--force' => true,  // Use --force to allow seeding in production
         ]);
         $this->line(Artisan::output());
     

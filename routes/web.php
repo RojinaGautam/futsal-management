@@ -11,6 +11,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StaffAttendanceController;
 use App\Http\Controllers\DashboardController;
 
+
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+
+Route::middleware([InitializeTenancyByDomain::class])->group(function () {
+
 // Public routes
 Route::get('/', function () {
     return redirect()->route('login.form');
@@ -81,5 +86,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/staff-attendance/{user_id}/{date}', [StaffAttendanceController::class, 'getAttendanceStatus'])->name('staff.attendance.status');
     Route::post('/staff-attendance/check-in', [StaffAttendanceController::class, 'checkIn'])->name('staff.attendance.checkIn');
     Route::post('/staff-attendance/check-out', [StaffAttendanceController::class, 'checkOut'])->name('staff.attendance.checkOut');
+});
 });
 
