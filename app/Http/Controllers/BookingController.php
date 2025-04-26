@@ -21,6 +21,8 @@ class BookingController extends Controller
             $query->whereDate('booking_date', $request->filter_date);
         }
         
+        $query->where('del_flg', false);
+        
         $bookings = $query->get();
         
         return response()->json($bookings);

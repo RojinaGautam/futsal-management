@@ -13,20 +13,29 @@ class CreateUpdateTotalDueLeftProcedure extends Migration
      */
     public function up()
     {
-        // Drop the event if it exists
+        // Drop existing events
         DB::unprepared('DROP EVENT IF EXISTS UpdateTotalDueLeftEvent');
 
-        // Drop the procedure if it exists
+        // Drop existing procedures
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateTotalDueLeft');
 
-        // Create the stored procedure
+        // Create the stored procedure for both academy and parkings
         DB::unprepared('
             CREATE PROCEDURE UpdateTotalDueLeft()
             BEGIN
+                -- Update academy table
                 UPDATE academy
                 SET total_due_left = total_due_left + monthly_price
                 WHERE DATEDIFF(CURDATE(), joined_date) >= 30
-                AND DATEDIFF(CURDATE(), joined_date) % 30 = 0;
+                AND DATEDIFF(CURDATE(), joined_date) % 30 = 0
+                AND del_flg = false;
+
+                -- Update parkings table
+                UPDATE parkings
+                SET total_due = total_due + monthly_price
+                WHERE DATEDIFF(CURDATE(), joined_date) >= 30
+                AND DATEDIFF(CURDATE(), joined_date) % 30 = 0
+                AND del_flg = false;
             END
         ');
 
@@ -34,7 +43,7 @@ class CreateUpdateTotalDueLeftProcedure extends Migration
         DB::unprepared('
             CREATE EVENT UpdateTotalDueLeftEvent
             ON SCHEDULE EVERY 1 DAY
-            STARTS CURRENT_TIMESTAMP
+            STARTS CONCAT(CURDATE(), " 00:00:00")
             DO
                 CALL UpdateTotalDueLeft();
         ');

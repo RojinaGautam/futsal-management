@@ -9,7 +9,7 @@ class ParkingController extends Controller
 {
     public function index()
     {
-        return view('backend.parking.index'); // Adjust the path as necessary
+        return view('backend.parking.index');
     }
 
     public function store(Request $request)
@@ -20,6 +20,7 @@ class ParkingController extends Controller
             'address' => 'required|string|max:255',
             'monthly_price' => 'required|numeric', // Validate monthly_price
             'total_due' => 'required|numeric', // Validate total_due
+            'joined_date' => 'required|date', // Add this line
         ]);
 
         Parking::create($request->all());
@@ -105,6 +106,7 @@ class ParkingController extends Controller
             'address' => $parking->address,
             'monthly_price' => $parking->monthly_price,
             'total_due' => $parking->total_due,
+            'joined_date' => $parking->joined_date,  // Add this line
             'payment_history' => $paymentHistory
         ]);
     }
@@ -117,6 +119,7 @@ class ParkingController extends Controller
             'address' => 'required|string|max:255',
             'monthly_price' => 'required|numeric', // Validate monthly_price
             'total_due' => 'required|numeric', // Validate total_due
+            'joined_date' => 'required|date', // Add this line
         ]);
 
         $parking = Parking::findOrFail($id);
@@ -144,11 +147,6 @@ class ParkingController extends Controller
 
         // Calculate the new total due
         $newTotalDue = $parking->total_due - $request->payment_amount;
-
-        // Ensure the new total due is not negative
-        if ($newTotalDue < 0) {
-            return response()->json(['error' => 'Payment amount exceeds total due.'], 400);
-        }
 
         // Update the total due
         $parking->total_due = $newTotalDue;

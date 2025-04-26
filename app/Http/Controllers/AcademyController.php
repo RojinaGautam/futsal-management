@@ -10,7 +10,7 @@ class AcademyController extends Controller
 {
     public function index()
     {
-        return view('backend.academy.index'); // Adjust the path as necessary
+        return view('backend.academy.index');
     }
 
     public function store(Request $request)
@@ -28,17 +28,22 @@ class AcademyController extends Controller
 
         $data = $request->all();
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/academy'), $imageName);
+            
+            // Store the image in 'storage/app/public/images/academy/'
+            $image->storeAs('images/academy', $imageName, 'public');
+            
+            // Save the file path (accessible via /storage/images/academy/)
             $data['image'] = 'images/academy/' . $imageName;
+
         }
-
+        
         Academy::create($data);
-
+        
         return response()->json(['success' => 'Academy member added successfully.']);
+        
     }
 
     // Add this to your controller that handles the academy.data route
@@ -179,10 +184,6 @@ class AcademyController extends Controller
         // Calculate the new total due left
         $newTotalDueLeft = $academy->total_due_left - $request->payment_amount;
 
-        // Ensure the new total due left is not negative
-        if ($newTotalDueLeft < 0) {
-            return response()->json(['error' => 'Payment amount exceeds total due left.'], 400);
-        }
 
         // Update the total due left
         $academy->total_due_left = $newTotalDueLeft;

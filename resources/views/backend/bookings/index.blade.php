@@ -152,6 +152,7 @@
                                 <div class="form-group">
                                     <label for="edit_booking_time" class="font-weight-bold">Booking Time</label>
                                     <select class="form-control" id="edit_booking_time" name="booking_time" required>
+                                        <option value="6:00 AM - 7:00 AM">6:00 AM - 7:00 AM</option>
                                         <option value="7:00 AM - 8:00 AM">7:00 AM - 8:00 AM</option>
                                         <option value="8:00 AM - 9:00 AM">8:00 AM - 9:00 AM</option>
                                         <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>

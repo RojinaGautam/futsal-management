@@ -69,6 +69,18 @@
           <span>Academy</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/users">
+          <i class="fas fa-fw fa-user"></i>
+          <span>Users</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/staff-attendance">
+          <i class="fas fa-fw fa-calendar-check"></i>
+          <span>Attendance</span>
+        </a>
+      </li>
       <div class="nav-separator"></div>
     </ul>
     <!-- Sidebar -->
@@ -250,6 +262,19 @@
 
         <!-- Container Fluid-->
         <div class="container-fluid" id="container-wrapper">
+          @if(auth()->check())
+            <div class="user-info">
+                @if(auth()->user()->hasRole('super-admin'))
+                    <span class="badge badge-danger">Super Admin</span>
+                @elseif(auth()->user()->hasRole('admin'))
+                    <span class="badge badge-warning">Admin</span>
+                @elseif(auth()->user()->hasRole('staff'))
+                    <span class="badge badge-info">Staff</span>
+                @else
+                    <span class="badge badge-secondary">User</span>
+                @endif
+            </div>
+          @endif
           @yield('content')
         </div>
 

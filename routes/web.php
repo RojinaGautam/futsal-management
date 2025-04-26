@@ -7,33 +7,36 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ParkingController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\StaffAttendanceController;
+use App\Http\Controllers\DashboardController;
 
-// Route for the home page
+// Public routes
 Route::get('/', function () {
     return redirect()->route('login.form');
 });
 
 // Route for the login page
-Route::get('/login', function () {
-    return view('backend.login');
-})->name('login.form');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 
 // Route to handle login submission
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-// Route for the admin dashboard
-Route::get('/admin', function () {
-    return view('backend.index');
-})->middleware('auth');
-
 // Route to handle logout
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/');
-})->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Academy routes protected by auth middleware
-Route::middleware('auth')->group(function () {
+// Protected routes - any authenticated user can access
+Route::middleware(['auth'])->group(function () {
+    // Dashboard access for all authenticated users
+    Route::get('/admin', [DashboardController::class,'index']);
+
+    // Later we can add role-specific middleware for specific features
+    // Example:
+    // Route::middleware(['role:super-admin'])->group(function () {
+    //     // Super admin only features
+    // });
+
+    // Academy routes
     Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
     Route::post('/academy/store', [AcademyController::class, 'store'])->name('academy.store');
     Route::get('/academy/data', [AcademyController::class, 'getAcademyData'])->name('academy.data');
@@ -52,23 +55,31 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}/payment', [BookingController::class, 'updatePayment'])->name('bookings.updatePayment');
     });
 
+    // Parking routes
+    Route::get('/parkings', [ParkingController::class, 'index'])->name('parkings.index');
+    Route::post('/parkings/store', [ParkingController::class, 'store'])->name('parkings.store');
+    Route::get('/parkings/data', [ParkingController::class, 'getParkingData'])->name('parkings.data');
+    Route::get('/parkings/{id}', [ParkingController::class, 'show'])->name('parkings.show');
+    Route::patch('/parkings/update/{id}', [ParkingController::class, 'update'])->name('parkings.update');
+    Route::delete('/parkings/{id}', [ParkingController::class, 'destroy'])->name('parkings.destroy');
+    Route::put('/parkings/{id}/payment', [ParkingController::class, 'updatePayment'])->name('parkings.updatePayment');
+
+    // User routes
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/data', [UserController::class, 'getUsers'])->name('users.data');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/unlock', [UserController::class, 'unlock'])->name('users.unlock');
+
+    // Staff attendance routes
+    Route::get('/staff-attendance', function () {
+        return view('backend.attendance.staff_attendance'); // Adjust the path as needed
+    })->name('staff.attendance');
+
+    Route::get('/staff-attendance/{user_id}/{date}', [StaffAttendanceController::class, 'getAttendanceStatus'])->name('staff.attendance.status');
+    Route::post('/staff-attendance/check-in', [StaffAttendanceController::class, 'checkIn'])->name('staff.attendance.checkIn');
+    Route::post('/staff-attendance/check-out', [StaffAttendanceController::class, 'checkOut'])->name('staff.attendance.checkOut');
 });
 
-// Parking routes protected by auth middleware
-Route::middleware('auth')->group(function () {
-    Route::prefix('parkings')->group(function () {
-        Route::get('/', [ParkingController::class, 'index'])->name('parkings.index');
-        Route::post('/store', [ParkingController::class, 'store'])->name('parkings.store');
-        Route::get('/data', [ParkingController::class, 'getParkingData'])->name('parkings.data');
-        Route::get('/{id}', [ParkingController::class, 'show'])->name('parkings.show');
-        Route::patch('/update/{id}', [ParkingController::class, 'update'])->name('parkings.update');
-        Route::delete('/{id}', [ParkingController::class, 'destroy'])->name('parkings.destroy');
-        Route::put('/{id}/payment', [ParkingController::class, 'updatePayment'])->name('parkings.updatePayment'); // Route for payment
-    });
-});
-
-Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])->name('attendance.fetch');
-Route::post('/attendance/submit', [AttendanceController::class, 'submitAttendance'])->name('attendance.store');
-Route::post('/attendance/submit', [AttendanceController::class, 'submitAttendance'])->name('attendance.submit');
-Route::get('/attendance/data', [AttendanceController::class, 'getAttendanceData'])->name('attendance.data');
