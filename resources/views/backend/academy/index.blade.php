@@ -464,7 +464,7 @@
                         $('#memberDetails').html(`
                             <div class="text-center mb-4">
                                 ${response.image ? 
-                                    `<img src="/storage/${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
+                                    `<img src="/${response.image}" class="rounded-circle" width="150" height="150" alt="Student Image">` :
                                     `<img src="images/default-avatar.png" class="rounded-circle" width="150" height="150" alt="Default Image">`
                                 }
                             </div>
@@ -632,7 +632,7 @@
                     // Show current image if it exists
                     if (response.image) {
                         $('#current_image').html(`
-                            <img src="/storage/${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
+                            <img src="/${response.image}" class="rounded-circle" width="100" height="100" alt="Current Image">
                             <p class="mt-2">Current Image</p>
                         `);
                     } else {

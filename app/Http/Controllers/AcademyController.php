@@ -28,18 +28,35 @@ class AcademyController extends Controller
 
         $data = $request->all();
 
+        // if ($request->hasFile('image')) {
+        //     $image = $request->file('image');
+        //     $imageName = time() . '.' . $image->getClientOriginalExtension();
+            
+        //     // Store the image in 'storage/app/public/images/academy/'
+        //     $image->storeAs('images/academy', $imageName, 'public');
+            
+        //     // Save the file path (accessible via /storage/images/academy/)
+        //     $data['image'] = 'images/academy/' . $imageName;
+
+        // }
+        $tenantName = tenant('id');
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Store the image in 'storage/app/public/images/academy/'
-            $image->storeAs('images/academy', $imageName, 'public');
-            
-            // Save the file path (accessible via /storage/images/academy/)
-            $data['image'] = 'images/academy/' . $imageName;
-
+    
+            $tenantFolder = 'images/academy/tenant_' . $tenantName;
+    
+            if (!file_exists(public_path($tenantFolder))) {
+                mkdir(public_path($tenantFolder), 0755, true);
+            }
+    
+            $image->move(public_path($tenantFolder), $imageName);
+    
+            $data['image'] = $tenantFolder . '/' . $imageName;
         }
-        
+    
+    
         Academy::create($data);
         
         return response()->json(['success' => 'Academy member added successfully.']);
@@ -90,10 +107,7 @@ class AcademyController extends Controller
         foreach ($academyMembers as $member) {
             // Format image URL if needed
             if ($member->image) {
-                $tenantPrefix = tenant('id'); // Replace with how you get the tenant ID
-                $imagePath = 'storage/tenant' . $tenantPrefix . '/images/academy/' . $member->image;
-                $member->image = asset($imagePath);
-
+                $member->image = global_asset($member->image);
             }
             
             // Add any other data processing needed
@@ -149,18 +163,41 @@ class AcademyController extends Controller
         ];
 
         // Handle image upload
+        // if ($request->hasFile('image')) {
+        //     // Delete old image if exists
+        //     if ($academyMember->image && file_exists(public_path($academyMember->image))) {
+        //         unlink(public_path($academyMember->image));
+        //     }
+
+        //     $image = $request->file('image');
+        //     $imageName = time() . '.' . $image->getClientOriginalExtension();
+        //     $image->move(public_path('images/academy'), $imageName);
+        //     $data['image'] = 'images/academy/' . $imageName;
+        // }
+
+        $tenantName = tenant('id');
+
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($academyMember->image && file_exists(public_path($academyMember->image))) {
                 unlink(public_path($academyMember->image));
             }
-
+    
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/academy'), $imageName);
-            $data['image'] = 'images/academy/' . $imageName;
+    
+            $tenantFolder = 'images/academy/tenant_' . $tenantName;
+    
+            if (!file_exists(public_path($tenantFolder))) {
+                mkdir(public_path($tenantFolder), 0755, true);
+            }
+    
+            $image->move(public_path($tenantFolder), $imageName);
+    
+            $data['image'] = $tenantFolder . '/' . $imageName;
         }
 
+        
         $academyMember->update($data);
 
         return response()->json(['success' => 'Academy member updated successfully.']);
