@@ -90,7 +90,10 @@ class AcademyController extends Controller
         foreach ($academyMembers as $member) {
             // Format image URL if needed
             if ($member->image) {
-                $member->image = asset('storage/' . $member->image);
+                $tenantPrefix = tenant('id'); // Replace with how you get the tenant ID
+                $imagePath = 'storage/tenant' . $tenantPrefix . '/images/academy/' . $member->image;
+                $member->image = asset($imagePath);
+
             }
             
             // Add any other data processing needed

@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="{{ asset('img/logo/logo.png') }}" rel="icon">
+    <link href="{{ global_asset('img/logo/logo.png') }}" rel="icon">
     <title>RAVE - Dashboard</title>
-    <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">  
+    <link href="{{ global_asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ global_asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ global_asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">  
     <style>
         .input-group {
             position: relative;
@@ -78,12 +78,12 @@
       </div>
     </div>
   </div>
-  <script src="{{ asset('backend/vendor/jquery/jquery.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-  <script src="{{ asset('backend/js/ruang-admin.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
-  <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+  <script src="{{ global_asset('backend/js/ruang-admin.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
+  <script src="{{ global_asset('backend/js/demo/chart-area-demo.js') }}"></script>
   
   <script>
     // Toggle password visibility

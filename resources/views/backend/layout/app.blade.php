@@ -7,22 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-  <link href="{{ asset('img/logo/logo.png') }}" rel="icon">
+  <link href="{{ global_asset('img/logo/logo.png') }}" rel="icon">
   <title>ravess - DashboardD</title>
-  <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">
+  <link href="{{ global_asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+  <link href="{{ global_asset('backend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ global_asset('backend/css/ruang-admin.min.css') }}" rel="stylesheet">
   <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Add CSRF token here -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.css') }}">
-  <link rel="stylesheet" href="{{asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
-  <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+  <link rel="stylesheet" href="{{ global_asset('backend/vendor/datatables/dataTables.bootstrap4.css') }}">
+  <link rel="stylesheet" href="{{global_asset('backend/vendor/datatables/dataTables.bootstrap4.min.css') }}">
+  <script src="{{ global_asset('backend/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
   <!-- 
-      <script src="{{ asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
+      <script src="{{ global_asset('backend/vendor/datatables/dataTables.bootstrap4.js') }}"></script>
       
-      <script src="{{ asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script> -->
+      <script src="{{ global_asset('backend/vendor/datatables/jquery.dataTables.js') }}"></script> -->
   <!-- Toastr CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
@@ -324,11 +324,11 @@
     <i class="fas fa-angle-up"></i>
   </a>
 
-  <script src="{{ asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-  <script src="{{ asset('backend/js/ruang-admin.min.js') }}"></script>
-  <script src="{{ asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
-  <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+  <script src="{{ global_asset('backend/js/ruang-admin.min.js') }}"></script>
+  <script src="{{ global_asset('backend/vendor/chart.js/Chart.min.js') }}"></script>
+  <script src="{{ global_asset('backend/js/demo/chart-area-demo.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script>
     // Optional: Set default options for Toastr
