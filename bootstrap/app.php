@@ -18,8 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            
         ]);
-        
+        $middleware->prepend(\Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class);
+        $middleware->prepend(\Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
