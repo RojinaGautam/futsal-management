@@ -22,7 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->prepend(\Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class);
         $middleware->prepend(\Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->renderable(function (Stancl\Tenancy\Contracts\TenantCouldNotBeIdentifiedException $e) {
+            return abort(404, " Tenant not found");     
+        });
         //
+
+
     })->create();
