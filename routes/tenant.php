@@ -7,7 +7,6 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AcademyController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ParkingController;
@@ -22,16 +21,14 @@ use App\Http\Controllers\DashboardController;
 |
 | Here you can register the tenant routes for your application.
 | These routes are loaded by the TenantRouteServiceProvider.
-|
-| Feel free to customize them however you want. Good luck!
+| Apply tenancy middleware ONLY to tenant routes.
 |
 */
 
 Route::middleware([
     'web',
-    'auth',
-    // 'tenant.check',
-    PreventAccessFromCentralDomains::class
+    InitializeTenancyByDomain::class, // Initialize tenancy
+    PreventAccessFromCentralDomains::class // Prevent central domain access
 ])->group(function () {
 
     Route::get('/', function () {
@@ -50,13 +47,7 @@ Route::middleware([
     // Protected routes - any authenticated user can access
     Route::middleware(['auth'])->group(function () {
         // Dashboard access for all authenticated users
-        Route::get('/admin', [DashboardController::class,'index']);
-
-        // Later we can add role-specific middleware for specific features
-        // Example:
-        // Route::middleware(['role:super-admin'])->group(function () {
-        //     // Super admin only features
-        // });
+        Route::get('/admin', [DashboardController::class, 'index']);
 
         // Academy routes
         Route::get('/academy', [AcademyController::class, 'index'])->name('academy.index');
@@ -97,7 +88,7 @@ Route::middleware([
 
         // Staff attendance routes
         Route::get('/staff-attendance', function () {
-            return view('backend.attendance.staff_attendance'); // Adjust the path as needed
+            return view('backend.attendance.staff_attendance');
         })->name('staff.attendance');
 
         Route::get('/staff-attendance/{user_id}/{date}', [StaffAttendanceController::class, 'getAttendanceStatus'])->name('staff.attendance.status');
